@@ -12,6 +12,7 @@ editor: visual
 #| label: load-pkg-data
 library(tidyverse)
 library(tidymodels)
+library(foreign)
 # add other packages as needed
 
 # add code to load data
@@ -22,7 +23,11 @@ library(tidymodels)
 ...
 
 ## Data description
-
+```{r}
+autism_ds <- read.arff("Autism-Adult-Data.arff")
+##Source:
+##UCI Machine Learning Repository. Autism Screening Adult Data Set. University of California, Irvine, 2018, https://archive.ics.uci.edu/dataset/426/autism+screening+adult.
+```
 ...
 
 ## Exploratory data analysis
