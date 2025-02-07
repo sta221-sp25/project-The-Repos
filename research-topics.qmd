@@ -17,3 +17,13 @@ editor: visual
 \pagebreak
 
 ## Research Topic 3
+
+Our third research topic could be for stock price prediction. The motivation for this topic is that it's a common real-world application of regression analysis – there tend to be underlying patterns to stock prices and lots of relationships with other variables, and it's a quantitative variable that we can predict via these models. Potential audiences include any potential investors of the stock – whether that's a firm or an uninformed individual. Some potential questions include:
+
+How well do interest rates predict the stock price movements of the technology sector?
+
+How can a company's price-to-earnings and debt-to-equity ratios and return on equity influence their monthly stock price returns?
+
+What is the relationship between foreign exchange rate fluctuations and stock price movements of multinational corporations in the S&P 500?
+
+NASDAQ offers historical data to work with, and there are also plenty of data sets available through the Federal Reserve Bank of St. Louis and Yahoo Finance. Data is generally quite accessible for this general topic of stock prices, but may require merging for other features, like foreign exchange rate fluctuations for example.
