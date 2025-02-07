@@ -1,6 +1,6 @@
 ---
 title: "Research Topics"
-author: "Team name - Team member 1, Team member 2, Team member 3, Team member 4"
+author: "The Repos - Jeffrey Bohrer, Alexandra Green, Anna Zhang, Kevin Lee"
 format: pdf
 execute: 
   warning: false
@@ -13,6 +13,18 @@ editor: visual
 \pagebreak
 
 ## Research Topic 2
+
+Our third research topic is on climate. Climate data includes the state of the atmosphere, such as temperature, precipitation, and wind speed, which can be used to examine weather patterns across various geographic regions and conduct time-series analysis to make predictions. By investigating this topic, we can better understand how our planet’s climate is changing, what factors are associated with the change, and potentially how we can mitigate climate change impacts.
+
+Potential research questions include:
+
+How does the total installed capacity of solar, wind, hydro, geothermal, and biomass power in a region affect its risk for severe weather events?
+
+How do land use patterns and precipitation amounts affect ocean acidification in the U.S.?
+
+How do the meteorological data help us predict the frequency, intensity, and geographic distribution of large-scale forest fires in the western U.S.?
+
+Here are some ideas about the type of data: air temperature, precipitation, sea surface temperature, sea level, wind speed, atmospheric CO2 concentration, the frequency of severe weather events in a year, the pH of seawater, and the amount of carbon dioxide in the water. 
 
 \pagebreak
 
