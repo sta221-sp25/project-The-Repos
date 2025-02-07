@@ -25,7 +25,20 @@ library(foreign)
 ## Data description
 ```{r}
 autism_ds <- read.arff("Autism-Adult-Data.arff")
+autism_ds <- autism_ds %>%
+  rename(small_sounds = A1_Score, 
+         difficult_to_understand_char  = A2_Score, 
+         ease_to_read_between_lines = A3_Score ,
+         focus_on_whole_picture = A4_Score,
+         i_can_tell_if_someone_bored = A5_Score,
+         i_can_multi_task = A6_Score,
+         i_can_tell_feelings_from_faces = A7_Score,
+         i_can_go_back_to_work_when_interrupted = A8_Score,
+         i_like_to_collect_info_on_categories = A9_Score,
+         i_find_it_hard_to_figure_out_others_intentions = A10_Score)
 ##Source:
+## Based on AQ-10 Test:https://embrace-autism.com/aq-10/
+## Score of 6 or higher is indicative of autistic traits
 ##UCI Machine Learning Repository. Autism Screening Adult Data Set. University of California, Irvine, 2018, https://archive.ics.uci.edu/dataset/426/autism+screening+adult.
 ```
 ...
