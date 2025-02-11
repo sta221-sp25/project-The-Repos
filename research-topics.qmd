@@ -14,7 +14,7 @@ editor: visual
 
 ## Research Topic 2
 
-Our third research topic is on climate. Climate data includes the state of the atmosphere, such as temperature, precipitation, and wind speed, which can be used to examine weather patterns across various geographic regions and conduct time-series analysis to make predictions. By investigating this topic, we can better understand how our planet’s climate is changing, what factors are associated with the change, and potentially how we can mitigate climate change impacts.
+Our second research topic is on climate. Climate data includes the state of the atmosphere, such as temperature, precipitation, and wind speed, which can be used to examine weather patterns across various geographic regions and conduct time-series analysis to make predictions. By investigating this topic, we can better understand how our planet’s climate is changing, what factors are associated with the change, and potentially how we can mitigate climate change impacts.
 
 Potential research questions include:
 
