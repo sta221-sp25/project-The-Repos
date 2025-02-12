@@ -10,6 +10,14 @@ editor: visual
 
 ## Research Topic 1
 
+Our first research topic is on autism, specifically by building a model to better predict autism early on. Because autism is extremely hard to diagnose, we recognize that it is important to develop a better test to ensure that those affected by it procure the treatment they need. The primary audience would likely be healthcare professionals and individuals who suspect they (or someone close to them) have autism and are attempting to more accurately assess their risk of having autism. Potential research questions include:
+
+1.  Can a simplified set of features, especially from just the screening questions, be used to classify autistic individuals early on?
+2.  Are there certain individual characteristics (e.g., age, gender, family history) that significantly influence ASD detection?
+3.  What features have the greatest importance when classifying autistic individuals?
+
+The data set for this topic is named *Autism-Adult-Data.arff*, a collection of ten behavioral questions and ten characteristics of individuals, each of which have been proven effective in detecting Autism Spectrum Disorder.
+
 \pagebreak
 
 ## Research Topic 2
