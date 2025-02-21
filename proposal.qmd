@@ -43,7 +43,7 @@ autism_ds <- autism_ds %>%
 ##UCI Machine Learning Repository. Autism Screening Adult Data Set. University of California, Irvine, 2018, https://archive.ics.uci.edu/dataset/426/autism+screening+adult.
 ```
 
-...
+Our data set on the autism screening of adults is published in the UCI Machine Learning Repository. It was created by Prof. Fadi Fayez Thabtah of the Manukau Institute of Technology in New Zealand in 2017. The data was sourced from voluntary participants of his app, ASDTests, which screens its users for potential indicators of autism using a 10-question survey. There are 704 observations in the data set and 20 different features: 10 being the answers to the questions of the survey about certain behaviors related to autism, and the remaining 10 being characteristics of the individual, like demographics of age and gender. We can determine the presence of autism to be likely and requiring further testing if an individual receives a score of 6 or higher, as found by Prof. Thabtah's research.
 
 ## Exploratory data analysis
 
@@ -55,14 +55,16 @@ The clear response variable of interest is “Class/ASD,” given that it is the
 
 In terms of relevant predictor variables, the most interesting ones to add to such a model would be individual AQ-10 question responses (binary, categorical)—given that these are the main questions used to provide a final diagnosis. Additionally, considering the interaction terms between such variables along with sex, age, and ethnic background would be interesting due to the prevalence of mentions in the literature that men tend to be diagnosed more often than women (Brickhill et al., 2023), older folk tend to be underdiagnosed and under-researched (Mason et al., 2022), and that white patients are more likely to be diagnosed.
 
-As a means of assessing such an ambitious research question, multiple models will be fitted until arriving the most parsimonious one and assessing whether they have a statistically significant effect on the final diagnosis as provided by the app. 
+As a means of assessing such an ambitious research question, multiple models will be fitted until arriving the most parsimonious one and assessing whether they have a statistically significant effect on the final diagnosis as provided by the app.
 
+======= In terms of relevant predictor variables, the most interesting ones to add to such a model would be individual AQ-10 question responses (binary, categorical)—given that these are the main questions used to provide a final diagnosis. Additionally, considering the interaction terms between such variables along with sex, age, and ethnic background would be interesting due to the prevalence of mentions in the literature that men tend to be diagnosed more often than women (Brickhill et al., 2023), older folk tend to be underdiagnosed and under-researched (Mason et al., 2022), and that white patients are more likely to be diagnosed. As a means of assessing such an ambitious research question, multiple models will be fitted until arriving the most parsimonious one and assessing whether they have a statistically significant effect on the final diagnosis as provided by the app.
 
 ## Data dictionary
 
-The data dictionary can be found [here](https://archive.ics.uci.edu/dataset/426/autism+screening+adult) 
+The data dictionary can be found [here](https://archive.ics.uci.edu/dataset/426/autism+screening+adult)
 
 ## References
+
 Brickhill, Rae et al. “Autism, thy name is man: Exploring implicit and explicit gender bias in autism perceptions.” PloS one vol. 18,8 e0284013. 23 Aug. 2023, doi:10.1371/journal.pone.0284013
 
 Mason, David et al. “Older Age Autism Research: A Rapidly Growing Field, but Still a Long Way to Go.” Autism in adulthood : challenges and management vol. 4,2 (2022): 164-172. doi:10.1089/aut.2021.0041
@@ -70,6 +72,3 @@ Mason, David et al. “Older Age Autism Research: A Rapidly Growing Field, but S
 Aylward, Brandon S et al. “Racial, Ethnic, and Sociodemographic Disparities in Diagnosis of Children with Autism Spectrum Disorder.” Journal of developmental and behavioral pediatrics : JDBP vol. 42,8 (2021): 682-689. doi:10.1097/DBP.0000000000000996
 
 Thabtah, Fadi, et al. “A New Computational Intelligence Approach to Detect Autistic Features for Autism Screening.” Applied Soft Computing, vol. 83, 2019, 105748. ScienceDirect, https://doi.org/10.1016/j.asoc.2018.06.011.
-
-
-
