@@ -16,18 +16,6 @@ library(foreign)
 
 # load data
 autism_ds <- read.arff("Autism-Adult-Data.arff")
-autism_ds <- autism_ds %>%
-  rename(small_sounds = A1_Score, 
-         difficult_to_understand_char  = A2_Score, 
-         ease_to_read_between_lines = A3_Score ,
-         focus_on_whole_picture = A4_Score,
-         i_can_tell_if_someone_bored = A5_Score,
-         i_can_multi_task = A6_Score,
-         i_can_tell_feelings_from_faces = A7_Score,
-         i_can_go_back_to_work_when_interrupted = A8_Score,
-         i_like_to_collect_info_on_categories = A9_Score,
-         i_find_it_hard_to_figure_out_others_intentions = A10_Score)
-autism_ds <- na.omit(autism_ds)
 ##Source:
 ## Based on AQ-10 Test:https://embrace-autism.com/aq-10/
 ## Score of 6 or higher is indicative of autistic traits
@@ -46,7 +34,22 @@ Our data set on the autism screening of adults is published in the UCI Machine L
 
 ## Exploratory data analysis
 
-Since the dataset from the website is in `.arff` (Weka Attribute-Relation File Format), the first step of processing the data is importing the `.arff` into R as a usable dataframe. The function to do so is `read.arff`, and it is stored as `autism_ds`. In the dataframe, some columns are named with abbreviated variable names, such as `A1_Score`, `A2_Score`, etc. These are not very descriptive, and it might cause confusion in analyzing and interpreting the data. Therefore, we renamed them to be more specific, based on the corresponding questions in the AQ-10 test. For instance, the first question is about noticing small sounds when others do not, so we renamed `A1_Score` to `small_sounds` in the dataframe. We renamed 10 such variables in total. The original dataset contains missing values. Having NAs when fitting regression models might affect the models' performance, so we used `na.omit` to remove observations with at least one missing values. The updated dataframe has 609 observations.
+```{r}
+autism_ds <- autism_ds |>
+  rename(small_sounds = A1_Score, 
+         difficult_to_understand_char  = A2_Score, 
+         ease_to_read_between_lines = A3_Score ,
+         focus_on_whole_picture = A4_Score,
+         i_can_tell_if_someone_bored = A5_Score,
+         i_can_multi_task = A6_Score,
+         i_can_tell_feelings_from_faces = A7_Score,
+         i_can_go_back_to_work_when_interrupted = A8_Score,
+         i_like_to_collect_info_on_categories = A9_Score,
+         i_find_it_hard_to_figure_out_others_intentions = A10_Score)
+autism_ds <- na.omit(autism_ds)
+```
+
+Since the dataset from the website is in `.arff` (Weka Attribute-Relation File Format), the first step of processing the data is importing the `.arff` into R as a usable dataframe. The function to do so is `read.arff`, and it is stored as `autism_ds` and then converted as a `.csv` file using the `write.csv` function and stored as `autism_cs.csv` in the data folder. In the dataframe `autism_ds`, some columns are named with abbreviated variable names, such as `A1_Score`, `A2_Score`, etc. These are not very descriptive, and it might cause confusion in analyzing and interpreting the data. Therefore, we renamed them to be more specific, based on the corresponding questions in the AQ-10 test. For instance, the first question is about noticing small sounds when others do not, so we renamed `A1_Score` to `small_sounds` in the dataframe. We renamed 10 such variables in total. The original dataset contains missing values. Having NAs when fitting regression models might affect the models' performance, so we used `na.omit` to remove observations with at least one missing values. The updated dataframe has 609 observations.
 
 ```{r}
 summary(autism_ds$result)
