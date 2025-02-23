@@ -26,7 +26,11 @@ autism_ds <- read.arff("Autism-Adult-Data.arff")
 
 ## Introduction
 
-...
+Autism Spectrum Disorder (ASD) remains a highly prevalent and incurable disease despite modern strides made in medical technology. It is reported that nearly 2.2% of adults are affected by ASD, and growing awareness has led to an uptick in diagnoses, particularly in adults who went undiagnosed early in life (Hirota 2023). However, ASD screening tests for all age groups currently contain significant inaccuracies. For example, the most widely used toddler screening test, CHAT-R/FAs, was recently found to produce false negatives in 25% of cases where results were negative, while the most commonly used adult autism screening test – the Autism-Spectrum Quotient (AQ) – was found to have limited predictive value in certain populations (Aishworiya 2023; Curnow 2023). Therefore, it has become critical to have more accurate tests and models to predict ASD in adults.
+
+In this study, we will find the features that have the greatest importance in determining whether an adult is autistic. The dataset being used will contain ten individual characteristics and ten behavioral questions, each of which has been proven to be effective in detecting ASD. Because ASD is difficult to diagnose and can significantly impair an individual's quality of life, developing a more accurate testing framework ensures that those affected will procure the treatment they need. These adults who receive a positive diagnosis can then access the support and resources needed to lead lives closer to their non-autistic peers.
+
+We believe that individual characteristics such as gender and ethnicity, along with questions assessing socialization abilities, are key predictors of autism.
 
 ## Data description
 
@@ -92,10 +96,16 @@ The data dictionary can be found [here](https://archive.ics.uci.edu/dataset/426/
 
 ## References
 
-Brickhill, Rae et al. “Autism, thy name is man: Exploring implicit and explicit gender bias in autism perceptions.” PloS one vol. 18,8 e0284013. 23 Aug. 2023, doi:10.1371/journal.pone.0284013
-
-Mason, David et al. “Older Age Autism Research: A Rapidly Growing Field, but Still a Long Way to Go.” Autism in adulthood : challenges and management vol. 4,2 (2022): 164-172. doi:10.1089/aut.2021.0041
+Aishworiya, R., Kim, V., MA, Stewart, S., Hagerman, R., & Feldman, H. M. (2023). Meta-analysis of the Modified Checklist for Autism in Toddlers, Revised/Follow-up for Screening. *PEDIATRICS*, *151*(6). https://doi.org/10.1542/peds.2022-059393
 
 Aylward, Brandon S et al. “Racial, Ethnic, and Sociodemographic Disparities in Diagnosis of Children with Autism Spectrum Disorder.” Journal of developmental and behavioral pediatrics : JDBP vol. 42,8 (2021): 682-689. doi:10.1097/DBP.0000000000000996
+
+Brickhill, Rae et al. “Autism, thy name is man: Exploring implicit and explicit gender bias in autism perceptions.” PloS one vol. 18,8 e0284013. 23 Aug. 2023, doi:10.1371/journal.pone.0284013
+
+Curnow, E., Utley, I., Rutherford, M., Johnston, L., & Maciver, D. (2023). Diagnostic assessment of autism in adults – current considerations in neurodevelopmentally informed professional learning with reference to ADOS-2. *Frontiers in Psychiatry*, *14*. https://doi.org/10.3389/fpsyt.2023.1258204
+
+Hirota, T., & King, B. H. (2023). Autism spectrum Disorder. *JAMA*, *329*(2), 157. https://doi.org/10.1001/jama.2022.23661
+
+Mason, David et al. “Older Age Autism Research: A Rapidly Growing Field, but Still a Long Way to Go.” Autism in adulthood : challenges and management vol. 4,2 (2022): 164-172. doi:10.1089/aut.2021.0041
 
 Thabtah, Fadi, et al. “A New Computational Intelligence Approach to Detect Autistic Features for Autism Screening.” Applied Soft Computing, vol. 83, 2019, 105748. ScienceDirect, https://doi.org/10.1016/j.asoc.2018.06.011.
