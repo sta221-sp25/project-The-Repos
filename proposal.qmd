@@ -1,6 +1,6 @@
 ---
 title: "Project Proposal"
-author: "The Repos- Jeffrey Bohrer, Alexandra Green, Anna Zhang, Kevin Lee"
+author: "The Repos - Jeffrey Bohrer, Alexandra Green, Anna Zhang, Kevin Lee"
 format: pdf
 execute: 
   warning: false
@@ -15,7 +15,7 @@ library(tidymodels)
 library(foreign)
 
 # load data
-autism_ds <- read.arff("Autism-Adult-Data.arff")
+autism_ds <- read.arff("data/Autism-Adult-Data.arff")
 ##Source:
 ## Based on AQ-10 Test:https://embrace-autism.com/aq-10/
 ## Score of 6 or higher is indicative of autistic traits
@@ -68,17 +68,14 @@ autism_ds |>
        title = "Histogram of Scoring Result")
 
 autism_ds |>
-  mutate(result = ifelse(autism_ds$result >= 6, 
-                "Indicative of Autistic Traits (Score 6 or Higher)",
-                "Not Indicative (Score less than 6)")) |>
-  ggplot(aes(x = result)) +
+  ggplot(aes(x = `Class/ASD`)) +
   geom_bar() +
   labs(x = "Test Result",
        y = "Count",
        title = "Distribution of Whether or not Result Indicative of Autism")
 ```
 
-The response variable `result` is a score between 0 and 10 from the AQ-10 questionnaire. According to the questionnaire, if the score is 6 or higher, it suggests that the person might have autism. If the score is less than 6, the person may not be autisitc. The distribution of the response variable `result` is fairly symmetrical with a mode at 4, and the distribution has a center at 5, which is the median. The spread can be measured by the IQR, which is 4 (Q3 - Q1 = 7 - 3 = 4). Based on the visualization, there does not appear any apparent outliers.
+The response variable `result` is a score between 0 and 10 from the AQ-10 questionnaire. According to the questionnaire, if the score is greater than 6, it suggests that the person might have autism. If the score is no more than 6, the person may not be autisitc. This result is further indicated by the variable `Class/ASD`, which is a categorical variable that is YES if the `result` is greater than 6 and NO otherwise. The distribution of the response variable `result`, which is quantitative, is fairly symmetrical with a mode at 4, and the distribution has a center at 5, which is the median. The spread can be measured by the IQR, which is 4 (Q3 - Q1 = 7 - 3 = 4). Based on the visualization, there does not appear any apparent outliers.
 
 ## Analysis approach
 
@@ -92,7 +89,7 @@ In terms of relevant predictor variables, the most interesting ones to add to su
 
 ## Data dictionary
 
-The data dictionary can be found [here](https://archive.ics.uci.edu/dataset/426/autism+screening+adult).
+The data dictionary can be found [here](https://github.com/sta221-sp25/project-The-Repos/blob/main/data/README.md).
 
 ## References
 
