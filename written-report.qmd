@@ -1,7 +1,7 @@
 ---
-title: "Your project title"
-author: "Team Name: Team member 1, Team member 2, Team member 3, Team member 4"
-date: "Update date"
+title: "Written Report on Factors that Help Diagnose Autism"
+author: "The Repos - Jeffrey Bohrer, Alexandra Green, Anna Zhang, Kevin Lee"
+date: "March 20, 2025"
 format: pdf
 execute: 
   warning: false
@@ -13,9 +13,64 @@ editor: visual
 ```{r}
 #| label: load packages and data
 
+library(tidyverse)
+library(tidymodels)
+
+autism_ds <- read_csv("data/autism_ds.csv")
 ```
 
 Your written report goes here!
+
+## Exploratory data analysis
+
+**Univariate EDA**
+
+```{r}
+summary(autism_ds$result)
+
+autism_ds |>
+  ggplot(aes(x = result)) +
+  geom_bar() +
+  scale_x_continuous(breaks = seq(0, 10, 1), 
+                     labels = as.character(seq(0, 10, 1))) +
+  labs(x = "Score",
+       y = "Count",
+       title = "Histogram of Scoring Result")
+
+autism_ds |>
+  ggplot(aes(x = `Class/ASD`)) +
+  geom_bar() +
+  labs(x = "Test Result",
+       y = "Count",
+       title = "Distribution of Whether or not Result Indicative of Autism")
+```
+
+```{r}
+autism_ds |>
+  ggplot(aes(x = ethnicity)) +
+  geom_bar() +
+  labs(x = "Ethnicity",
+       y = "Count",
+       title = "Distribution of Ethnicity in the Dataset") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+autism_ds |>
+  ggplot(aes(x = age)) +
+  geom_bar() +
+  labs(x = "Age",
+       y = "Count",
+       title = "Distribution of Age in the Dataset") +
+  xlim(10, 75)
+
+autism_ds |>
+  ggplot(aes(x = `i_can_go_back_to_work_when_interrupted`)) +
+  geom_bar() +
+  labs(x = "Whether or not continue working after interrupted",
+       y = "Count",
+       title = "Distribution of the Ability to Return to Work after Interruption in the Dataset")
+```
 
 ::: callout-important
 Before you submit, make sure your code chunks are turned off with `echo: false` and there are no warnings or messages with `warning: false` and `message: false` in the YAML.
