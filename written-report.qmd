@@ -15,8 +15,9 @@ editor: visual
 
 library(tidyverse)
 library(tidymodels)
-
-autism_ds <- read_csv("data/autism_ds.csv")
+library(patchwork)
+autism_ds <- read_csv("data/autism_ds.csv") %>%
+  mutate(ethnicity = ifelse(ethnicity == "others", "Others", ethnicity))
 ```
 
 Your written report goes here!
@@ -71,7 +72,186 @@ autism_ds |>
        y = "Count",
        title = "Distribution of the Ability to Return to Work after Interruption in the Dataset")
 ```
+**Bivariate EDA**
+```{r}
+### Result score distributions by ethnicity
+ggplot(autism_ds, 
+       aes(x = result,
+           y = ethnicity,
+           fill = ethnicity)) +
+  geom_boxplot() +
+  labs(
+    title = "Distribution of Scores Across Ethnicity",
+    x = "Score",
+    y = "Ethnicity"
+  ) +
+  theme_gray()
 
+ggplot(autism_ds, 
+       aes(x = result,
+           y = relation,
+           fill = relation)) +
+  geom_violin(alpha = 0.5) +
+  labs(
+    title = "Distribution of Scores Across Person Filling Test",
+    x = "Score",
+    y = "Relation",
+    fill
+  ) +
+  theme_gray()
+
+Q1 <- ggplot(autism_ds, 
+       aes(x = small_sounds,
+           y = gender,
+           fill = gender)) +
+  geom_violin() +
+  labs(
+    title = "Q1",
+    x = "Score",
+    y = "Gender"
+  ) +
+  scale_x_continuous(guide = "none") +
+  scale_y_discrete(guide = "none") +
+  scale_fill_discrete(guide = "none") +
+  theme_gray()
+
+Q2 <- ggplot(autism_ds, 
+       aes(x = difficult_to_understand_char,
+           y = gender,
+           fill = gender)) +
+  geom_violin() +
+  labs(
+    title = "Q2",
+    x = "Score",
+    y = "Gender"
+  ) +
+  scale_x_continuous(guide = "none") +
+  scale_y_discrete(guide = "none") +
+  scale_fill_discrete(guide = "none") +
+  theme_gray()
+
+Q3 <- ggplot(autism_ds, 
+       aes(x = ease_to_read_between_lines,
+           y = gender,
+           fill = gender)) +
+  geom_violin() +
+  labs(
+    title = "Q3",
+    x = "Score",
+    y = "Gender"
+  ) +
+  scale_x_continuous(guide = "none") +
+  scale_y_discrete(guide = "none") +
+  scale_fill_discrete(guide = "none") +
+  theme_gray()
+
+Q4 <- ggplot(autism_ds, 
+       aes(x = focus_on_whole_picture,
+           y = gender,
+           fill = gender)) +
+  geom_violin() +
+  labs(
+    title = "Q4",
+    x = "Score",
+    y = "Gender"
+  ) +
+  scale_x_continuous(guide = "none") +
+  scale_y_discrete(guide = "none") +
+  scale_fill_discrete(guide = "none") +
+  theme_gray()
+
+Q5 <- ggplot(autism_ds, 
+       aes(x = i_can_tell_if_someone_bored,
+           y = gender,
+           fill = gender)) +
+  geom_violin() +
+  labs(
+    title = "Q5",
+    x = "Score",
+    y = "Gender"
+  ) +
+  scale_x_continuous(guide = "none") +
+  scale_y_discrete(guide = "none") +
+  scale_fill_discrete(guide = "none") +
+  theme_gray()
+
+Q6 <- ggplot(autism_ds, 
+       aes(x = i_can_multi_task,
+           y = gender,
+           fill = gender)) +
+  geom_violin() +
+  labs(
+    title = "Q6",
+    x = "Score",
+    y = "Gender"
+  ) +
+  scale_x_continuous(guide = "none") +
+  scale_y_discrete(guide = "none") +
+  scale_fill_discrete(guide = "none") +
+  theme_gray()
+
+Q7 <- ggplot(autism_ds, 
+       aes(x = i_can_tell_feelings_from_faces,
+           y = gender,
+           fill = gender)) +
+  geom_violin() +
+  labs(
+    title = "Q7",
+    x = "Score",
+    y = "Gender"
+  ) +
+  scale_x_continuous(guide = "none") +
+  scale_y_discrete(guide = "none") +
+  scale_fill_discrete(guide = "none") +
+  theme_gray()
+Q8 <- ggplot(autism_ds, 
+       aes(x = i_can_go_back_to_work_when_interrupted,
+           y = gender,
+           fill = gender)) +
+  geom_violin() +
+  labs(
+    title = "Q8",
+    x = "Score",
+    y = "Gender"
+  ) +
+  scale_x_continuous(guide = "none") +
+  scale_y_discrete(guide = "none") +
+  scale_fill_discrete(guide = "none") +
+  theme_gray()
+Q9 <- ggplot(autism_ds, 
+       aes(x = i_like_to_collect_info_on_categories,
+           y = gender,
+           fill = gender)) +
+  geom_violin() +
+  labs(
+    title = "Q9",
+    x = "Score",
+    y = "Gender"
+  ) +
+  scale_x_continuous(guide = "none") +
+  scale_y_discrete(guide = "none") +
+  scale_fill_discrete(guide = "none") +
+  theme_gray()
+
+Q10 <- ggplot(autism_ds, 
+       aes(x = i_find_it_hard_to_figure_out_others_intentions,
+           y = gender,
+           fill = gender)) +
+  geom_violin() +
+  labs(
+    title = "Q10",
+    x = "Score",
+    y = "Gender"
+  ) +
+  theme_gray()
+
+(Q1 | Q2) /
+(Q3 |Q4) /
+(Q5 | Q6) /
+(Q7 | Q8) / 
+(Q9 | Q10)
+
+```
 ::: callout-important
 Before you submit, make sure your code chunks are turned off with `echo: false` and there are no warnings or messages with `warning: false` and `message: false` in the YAML.
 :::
