@@ -11,6 +11,9 @@ editor: visual
 ---
 
 ```{r}
+#|echo: false
+#|warning: false
+#|message: false
 #| label: load packages and data
 
 library(tidyverse)
@@ -24,15 +27,18 @@ autism_ds <- read_csv("data/autism_ds.csv") %>%
 
 **Introduction**
 
-Autism Spectrum Disorder (ASD) remains a highly prevalent and incurable disease despite modern strides made in medical technology. It is reported that nearly 2.2% of adults are affected by ASD, and growing awareness has led to an uptick in diagnoses, particularly in adults who went undiagnosed early in life (Hirota 2023). However, ASD screening tests for all age groups currently contain significant inaccuracies. For example, the most widely used toddler screening test, CHAT-R/FAs, was recently found to produce false negatives in 25% of cases where results were negative, while the most commonly used adult autism screening test – the Autism-Spectrum Quotient (AQ) – was found to have limited predictive value in certain populations (Aishworiya 2023; Curnow 2023). Therefore, it has become critical to identify stronger predictors or explore underlying relationships in order to have more accurate tests and models to predict ASD in adults.
+Autism Spectrum Disorder (ASD) remains a highly prevalent condition despite modern strides made in medical technology. It is reported that nearly 2.2% of adults are affected by ASD, and growing awareness has led to an uptick in diagnoses, particularly in adults who went undiagnosed early in life (Hirota 2023). However, ASD screening tests for all age groups currently contain significant inaccuracies. For example, the most widely used toddler screening test, CHAT-R/FAs, was recently found to produce false negatives in 25% of cases. In contrast, the most commonly used adult autism screening test – the Autism-Spectrum Quotient (AQ) – was found to have limited predictive value in certain populations (Aishworiya 2023; Curnow 2023). Therefore, it has become critical to identify stronger predictors or explore underlying relationships to have more accurate tests and models to predict ASD in adults.
 
-In this study, we will focus on identifying the features that most greatly affect the probability of being encouraged to pursue a diagnosis. The dataset being used will contain ten individual characteristics and ten behavioral questions, each of which have been associated with ASD diagnoses. Because ASD is difficult to identify and can significantly impair an individual's quality of life, understanding the relationship between demographics, certain behaviors, and their association with autism could encourage individuals to seek diagnosis and gain the self-understanding they need. These adults who receive a positive diagnosis can then access the necessary support and resources. We believe that individual characteristics such as gender and ethnicity, along with answers to questions assessing socialization abilities, are key predictors of autism.
+In this study, we will focus on identifying the features that most greatly affect the probability of being encouraged to pursue a diagnosis. The dataset being used will contain ten individual characteristics and ten behavioral questions, each of which has been associated with ASD diagnoses. Because ASD is difficult to identify and can significantly impair an individual's quality of life, understanding the relationship between demographics, certain behaviors, and their association with autism could encourage individuals to seek diagnosis and gain the self-understanding they need. These adults who receive a positive diagnosis can then access the necessary support and resources. We believe that individual characteristics such as gender and ethnicity, along with answers to questions assessing socialization abilities, are key predictors of autism.
 
 The test scores were slightly right-skewed with no significant outliers, and despite the majority of test-takers not being encouraged to seek diagnosis, a significant proportion was. In the test, the potential ASD indicator of difficulty resuming work after a distraction was frequently noted. Within racial distributions, Latino participants had the highest proportion of high scores, White-Europeans were the most common, and certain groups had significantly higher IQRs, such as Black and Hispanic groups, compared to groups such as the Turkish and Middle Eastern. However, some ethnicities had fewer than 50 observations, limiting generalizability. Between men and women, we also noted minimal differences.
 
 **Univariate EDA**
 
 ```{r}
+#|echo: false
+#|warning: false
+#|message: false
 summary(autism_ds$result)
 
 autism_ds |>
@@ -50,6 +56,9 @@ nrow(autism_ds[autism_ds$'Class/ASD' == 'YES', ])/nrow(autism_ds)
 As we can see as a quick summary of our data, the variable we are most interested in – the final score of users – ranges from 0 to 10, which makes sense as there are 10 questions that can be answered either 'Yes' or 'No'. Generally, the scores are a bit right-skewed, with a single peak around 4 or 5 points. The mean is found to be 5.077 points, and the median is 5 points, which is relatively high given that a score of higher than 6 warrants further investigation into a diagnosis. However, as suspecting a diagnosis is reason to take a test in the first place, that is a reasonable reflection of the population taking this test. We then observe that roughly 30% of test takers are encouraged to seek a diagnosis, due to a score higher than 6. We also observe the IQR to be 4 points, as most test takers have a score between 3 and 7 points inclusive. This is a reasonable spread in the context of the potential values, and in this context, no outliers exist.
 
 ```{r}
+#|echo: false
+#|warning: false
+#|message: false
 autism_ds |>
   ggplot(aes(x = `Class/ASD`)) +
   geom_bar() +
@@ -61,6 +70,9 @@ autism_ds |>
 Additionally, here is a visual demonstration of the number of test takers receiving further encouragement to pursue a professional diagnosis of ASD. Though still significantly less than those not encouraged, a notable proportion of test takers were informed they had traits or behaviors indicative of autism.
 
 ```{r}
+#|echo: false
+#|warning: false
+#|message: false
 autism_ds |>
   ggplot(aes(x = ethnicity)) +
   geom_bar() +
@@ -73,6 +85,9 @@ autism_ds |>
 We observe here that the most common ethnicity was White-Europeans, with over 200 observations in our data set. Secondly and thirdly, we observe the Asian and Middle Eastern populations to be above 100 and slightly below 100 observations, respectively. All other ethnicities have less than 50 observations in our data set, meaning it may be more difficult to draw conclusions about these populations. We can now check and see how the percentages of being encouraged to seek a diagnosis differ by ethnicity:
 
 ```{r}
+#|echo: false
+#|warning: false
+#|message: false
 autism_ds %>%
   group_by(ethnicity) %>%
   summarize(yes_count = sum(`Class/ASD` == "YES"),
@@ -89,6 +104,9 @@ autism_ds %>%
 As we can see here, the population with the highest proportion of test takers receiving a high test score was the Latino population, with close to half achieving higher than a 6. Since this is a comparably uncommon population in our data set, it does raise questions of whether it is indicative of the greater Latino population or merely due to the smaller sample size in our data set. Additionally, the White-European, Black, and Hispanic populations also demonstrate a greater proportion of high test scores. The variation in these proportions according to ethnicity warrants further exploration for how the distribution of test scores differs by ethnicity as well.
 
 ```{r}
+#|echo: false
+#|warning: false
+#|message: false
 autism_ds |>
   ggplot(aes(x = age)) +
   geom_bar() +
@@ -113,6 +131,9 @@ Additionally, as a brief glance at one of the ten questions on the test, we see 
 **Bivariate EDA**
 
 ```{r}
+#|echo: false
+#|warning: false
+#|message: false
 ### Result score distributions by ethnicity
 ggplot(autism_ds, 
        aes(x = result,
