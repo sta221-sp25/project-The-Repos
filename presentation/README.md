@@ -1,1 +1,1 @@
-Put presentation slides in this folder. If the slides are online (e.g. Google slides) you can put a link to the slides in this README.
+[Here](https://docs.google.com/presentation/d/1Xah48c3Uo3guXbl3nMf-MYjro0RkTCQx9FnwLaOIstY/edit?usp=sharing) is the presentation.

@@ -96,8 +96,8 @@ autism_ds %>%
   ggplot(aes(x = ethnicity, y = proportion_yes)) +
   geom_col() +
   labs(x = "Ethnicity",
-       y = "Proportion of Test Scores Indicative of ASD",
-       title = "Proportion of Indicative Test Scores by Ethnicity") +
+       y = "Proportion of Test Scores",
+       title = "Proportion of Indicative Test Scores") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
@@ -121,7 +121,7 @@ autism_ds |>
   geom_bar() +
   labs(x = "Whether or not continue working after interrupted",
        y = "Count",
-       title = "Distribution of the Ability to Return to Work after Interruption in the Dataset")
+       title = "Distribution of the Ability to Return to Work after Interruption")
 ```
 
 Generally, we observe the distribution of ages to possess a strong right-skewness, with a mean age of 30.22 and a median age of 27. There is a clear peak in the distribution roughly around early to mid 20's years of age. The ages possess a minimum of 17 up to a maximum age of 383, which is clearly a false observation that needs to be filtered from the data. The IQR is 13 years, which is a fairly small spread given the range of ages, as we observe that it seems the majority of test-takers are under 30 years old.
