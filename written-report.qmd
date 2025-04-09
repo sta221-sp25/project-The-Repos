@@ -19,6 +19,8 @@ editor: visual
 library(tidyverse)
 library(tidymodels)
 library(patchwork)
+library(knitr)
+
 autism_ds <- read_csv("data/autism_ds.csv") %>%
   mutate(ethnicity = ifelse(ethnicity == "others", "Others", ethnicity))
 ```
@@ -308,6 +310,66 @@ Here we present several graphs displaying bivariate relationships. With our firs
 Interestingly, we can also observe how the relationship between the test taker and the subject of the questions may lead to different distributions of test scores. In the case when it is filled out by a relative or health care professional for example, the observed test score is 2 or greater, while in the case of the test taker being the subject or the parent of the subject, some still received a score of 0. This may reflect how personal biases or context affect truthfulness during the test.
 
 Surprisingly, we can also observe minimal differences in how each gender answered the ten questions, with generally comparable distributions of 'Yes' and 'No'. This may be a point of further investigation as typically women tend to be underdiagnosed relative to men.
+
+## Introduction and Data
+
+## Methodology
+
+```{r}
+autism_ds <- autism_ds %>%
+  mutate(highProb = if_else(result > 6, 1, 0))
+
+reduced_model <- glm(highProb ~ 1, 
+              data = autism_ds, family = "binomial")
+ethnicity_model <- glm(highProb ~ ethnicity, 
+              data = autism_ds, family = "binomial")
+
+(deviance_reduced <- -2 * glance(reduced_model)$logLik)
+(deviance_full <- -2 * glance(ethnicity_model)$logLik)
+(G <- deviance_reduced - deviance_full)
+pchisq(G, df = 9, lower.tail = FALSE)
+
+tidy(ethnicity_model) |>
+  kable(digits = 3)
+```
+
+```{r}
+autism_ds <- autism_ds %>%
+  mutate(highProb = if_else(result > 6, 1, 0))
+
+reduced_model <- glm(highProb ~ 1, 
+              data = autism_ds, family = "binomial")
+relation_model <- glm(highProb ~ relation, 
+              data = autism_ds, family = "binomial")
+
+(deviance_reduced <- -2 * glance(reduced_model)$logLik)
+(deviance_full <- -2 * glance(relation_model)$logLik)
+(G <- deviance_reduced - deviance_full)
+pchisq(G, df = 4, lower.tail = FALSE)
+
+tidy(relation_model) |>
+  kable(digits = 3)
+```
+
+```{r}
+autism_ds <- autism_ds %>%
+  mutate(highProb = if_else(result > 6, 1, 0))
+
+reduced_model <- glm(highProb ~ 1, 
+              data = autism_ds, family = "binomial")
+q1_model <- glm(highProb ~ small_sounds, 
+              data = autism_ds, family = "binomial")
+
+(deviance_reduced <- -2 * glance(reduced_model)$logLik)
+(deviance_full <- -2 * glance(q1_model)$logLik)
+(G <- deviance_reduced - deviance_full)
+pchisq(G, df = 1, lower.tail = FALSE)
+
+tidy(q1_model) |>
+  kable(digits = 3)
+```
+
+## Results
 
 ## References
 
