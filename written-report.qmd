@@ -23,10 +23,13 @@ library(knitr)
 library(tibble)
 library(kableExtra)
 library(glmnet)
+library(pROC)
+library(car)
 
 autism_ds <- read_csv("data/autism_ds.csv") %>%
   mutate(ethnicity = ifelse(ethnicity == "others", "Others", ethnicity))
 ```
+
 ## Introduction
 
 Autism Spectrum Disorder (ASD) remains a highly prevalent condition despite modern strides made in medical technology. It is reported that nearly 2.2% of adults are affected by ASD, and growing awareness has led to an uptick in diagnoses, particularly in adults who went undiagnosed early in life (Hirota 2023). However, ASD screening tests for all age groups currently contain significant inaccuracies. For example, the most widely used toddler screening test, CHAT-R/FAs, was recently found to produce false negatives in 25% of cases. In contrast, the most commonly used adult autism screening test – the Autism-Spectrum Quotient (AQ) – was found to have limited predictive value in certain populations (Aishworiya 2023; Curnow 2023). Therefore, it has become critical to identify stronger predictors or explore underlying relationships to have more accurate tests and models to predict ASD in adults.
@@ -312,7 +315,9 @@ Interestingly, we can also observe how the relationship between the test taker a
 Surprisingly, we can also observe minimal differences in how each gender answered the ten questions, with generally comparable distributions of 'Yes' and 'No'. This may be a point of further investigation as typically women tend to be underdiagnosed relative to men.
 
 ## Methodology
+
 **Choosing Predictors**
+
 ```{r, include = FALSE}
 ### Ethnicity DD
 autism_ds <- autism_ds %>%
@@ -331,6 +336,7 @@ cat("p-value:", pchisq(G, df = 9, lower.tail = FALSE), "\n")
 tidy(ethnicity_model) |>
   kable(digits = 3)
 ```
+
 ```{r, include = FALSE}
 ### Relation DD
 autism_ds <- autism_ds %>%
@@ -349,6 +355,7 @@ cat("p-value:",pchisq(G, df = 4, lower.tail = FALSE), "\n")
 tidy(relation_model) |>
   kable(digits = 3)
 ```
+
 ```{r, include = FALSE}
 ### Q1
 autism_ds <- autism_ds %>%
@@ -367,6 +374,7 @@ cat("p-value:",pchisq(G, df = 1, lower.tail = FALSE), "\n")
 tidy(q1_model) |>
   kable(digits = 3)
 ```
+
 ```{r, include = FALSE}
 ### Q2
 autism_ds <- autism_ds %>%
@@ -385,6 +393,7 @@ cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
 tidy(ethnicity_model) |>
   kable(digits = 3)
 ```
+
 ```{r, include=FALSE}
 ### Q3
 autism_ds <- autism_ds %>%
@@ -403,6 +412,7 @@ cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
 tidy(ethnicity_model) |>
   kable(digits = 3)
 ```
+
 ```{r, include = FALSE}
 ###q4
 autism_ds <- autism_ds %>%
@@ -421,6 +431,7 @@ cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
 tidy(ethnicity_model) |>
   kable(digits = 3)
 ```
+
 ```{r, include = FALSE}
 ###Q5
 autism_ds <- autism_ds %>%
@@ -439,6 +450,7 @@ cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
 tidy(ethnicity_model) |>
   kable(digits = 3)
 ```
+
 ```{r, include = FALSE}
 ##Q6
 autism_ds <- autism_ds %>%
@@ -457,6 +469,7 @@ cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
 tidy(ethnicity_model) |>
   kable(digits = 3)
 ```
+
 ```{r, include = FALSE}
 ###Q7
 autism_ds <- autism_ds %>%
@@ -475,6 +488,7 @@ cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
 tidy(ethnicity_model) |>
   kable(digits = 3)
 ```
+
 ```{r, include = FALSE}
 autism_ds <- autism_ds %>%
   mutate(highProb = if_else(result > 6, 1, 0))
@@ -492,6 +506,7 @@ cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
 tidy(ethnicity_model) |>
   kable(digits = 3)
 ```
+
 ```{r, include = FALSE}
 ###Q8
 autism_ds <- autism_ds %>%
@@ -510,6 +525,7 @@ cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
 tidy(ethnicity_model) |>
   kable(digits = 3)
 ```
+
 ```{r, include = FALSE}
 ###Q9
 autism_ds <- autism_ds %>%
@@ -528,6 +544,7 @@ cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
 tidy(ethnicity_model) |>
   kable(digits = 3)
 ```
+
 ```{r, include = FALSE}
 ### Q10
 autism_ds <- autism_ds %>%
@@ -546,6 +563,7 @@ cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
 tidy(ethnicity_model) |>
   kable(digits = 3)
 ```
+
 ```{r, include = FALSE}
 autism_ds <- autism_ds %>%
   mutate(highProb = if_else(result > 6, 1, 0))
@@ -563,6 +581,7 @@ cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
 tidy(ethnicity_model) |>
   kable(digits = 3)
 ```
+
 ```{r, include = FALSE}
 ### Gender
 autism_ds <- autism_ds %>%
@@ -581,6 +600,7 @@ cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
 tidy(ethnicity_model) |>
   kable(digits = 3)
 ```
+
 ```{r, include = FALSE}
 ### Jaundice
 autism_ds <- autism_ds %>%
@@ -599,10 +619,9 @@ cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
 tidy(ethnicity_model) |>
   kable(digits = 3)
 ```
-A drop-in-deviance test between a logistic null model without predictor variables and a logistic model with a single predictor was systematically conducted across all predictor variables as a means of assessing which predictors provide a statistically significant improvemnet in model fit against the null condition. The hypothesis for this test can be observed below:
-$$H_0: \beta_1 = 0$$
-$$H_a: \beta_1 \neq 0$$
-- Table 1: Drop-in-deviance test results comparing null model $log(\frac{\hat\pi}{1-\hat\pi})=\beta_0$ to single-predictor model $log(\frac{\pi}{1-\pi})=\beta_0 + \beta_1X_1$
+
+A drop-in-deviance test between a logistic null model without predictor variables and a logistic model with a single predictor was systematically conducted across all predictor variables as a means of assessing which predictors provide a statistically significant improvemnet in model fit against the null condition. The hypothesis for this test can be observed below: $$H_0: \beta_1 = 0$$ $$H_a: \beta_1 \neq 0$$ - Table 1: Drop-in-deviance test results comparing null model $log(\frac{\hat\pi}{1-\hat\pi})=\beta_0$ to single-predictor model $log(\frac{\pi}{1-\pi})=\beta_0 + \beta_1X_1$
+
 ```{r, echo = FALSE}
 tribble(
   ~"Predictor", ~"G-stat", ~"p-value",
@@ -624,13 +643,28 @@ tribble(
 ) |>
   kable()
 ```
-From the results of this test, it is evident that the parameters that are statistically significant for model fit are Q1-10, ethnicity, gender, and, quite surprisingly, jaundice when compared to a null model as the p-values are either significantly less than 0.05 (Q1-10 + ethnicity) or slighly below it (gender and jaundice). Due to this consideration, the first model to be analyzed will be a simple additive model that takes into account all these statistically significant predictors. 
 
-**Fitting the model**
-As said before, an additive logistic regression model of the following form was fitted:
-$$log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_1X_{Q1}+...+\beta_{10}X_{Q10}+\beta_{ethnicity}X_{ethnicity}+\beta_{gender}X_{gender}+\beta_{jaundice}X_{jaundice}$$
-Given that the condition we established for the "high probability" (i.e. total score greater than 6) allows the logistic model to perfectly separate the response variable in the data into "high" and "low" probabiities (thus making the respective MLE for $\beta_j$ go to infinity), a penalized logistic regression model (LASSO) was employed (Marin, 2021).
+From the results of this test, it is evident that the parameters that are statistically significant for model fit are Q1-10, ethnicity, gender, and, quite surprisingly, jaundice when compared to a null model as the p-values are either significantly less than 0.05 (Q1-10 + ethnicity) or slighly below it (gender and jaundice). Due to this consideration, the first model to be analyzed will be a simple additive model that takes into account all these statistically significant predictors.
+
+**Fitting the model** As said before, an additive logistic regression model of the following form was fitted: $$log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_1X_{Q1}+...+\beta_{10}X_{Q10}+\beta_{ethnicity}X_{ethnicity}+\beta_{gender}X_{gender}+\beta_{jaundice}X_{jaundice}$$ Given that the condition we established for the "high probability" (i.e. total score greater than 6) allows the logistic model to perfectly separate the response variable in the data into "high" and "low" probabiities (thus making the respective MLE for $\beta_j$ go to infinity), a penalized logistic regression model (LASSO) was employed (Marin, 2021).
+
 ```{r}
+complex_log_mod <- glm(highProb ~ 
+                         small_sounds +
+                         difficult_to_understand_char +
+                         ease_to_read_between_lines +
+                         focus_on_whole_picture +
+                         i_can_tell_if_someone_bored +
+                         i_can_multi_task +
+                         i_can_tell_feelings_from_faces +
+                         i_can_go_back_to_work_when_interrupted +
+                         i_like_to_collect_info_on_categories +
+                         i_find_it_hard_to_figure_out_others_intentions +
+                         ethnicity +
+                         gender +
+                         jundice,  # corrected spelling
+                       data = autism_ds, 
+                       family = binomial)
 X <- model.matrix(highProb ~ 
                     small_sounds +
                     difficult_to_understand_char +
@@ -662,12 +696,32 @@ final_lasso_model <- glmnet(X, y, family = "binomial", alpha = 1, lambda = best_
 tidy(final_lasso_model) |>
   kable(digits = 3)
 ```
-This model was then employed to augment the original data frame and obtain the estimated probabilities for each observation, these would later be employed for an ROC curve to determine the optimal prediction threshold. 
+Considering the closely related questions regarding sensory and behavioral tendencies, multicollinearity is a major concern. Subsequently, a VIF test was conducted as a means of evaluating multicollinearity.
+```{r}
+vif(complex_log_mod) |>
+  kable(digits = 3)
+```
+This model was then employed to augment the original data frame and obtain the estimated probabilities for each observation, these would later be employed for an ROC curve to determine the optimal prediction threshold.
+
 ```{r}
 autism_ds_aug <- autism_ds
 autism_ds_aug$predicted_prob <- predict(final_lasso_model, newx = X, type = "response")
-
 ```
+
+```{r}
+# Ensure predicted_prob is a numeric vector for the positive class (1)
+predicted_prob_numeric <- autism_ds_aug$predicted_prob[, 1]  # Assuming column 2 is the probability for "case" (1)
+
+# Create ROC curve again with corrected predicted probabilities
+roc_curve <- roc(autism_ds_aug$highProb, predicted_prob_numeric)
+
+# Plot the ROC curve
+plot(roc_curve, main = "ROC Curve", col = "blue", lwd = 2)
+
+# Add AUC (Area Under the Curve)
+auc(roc_curve)
+```
+The area under the curve is 1, this tells us that the model is able to perfectly fit the data throughout all thresholds. This could very well be due to over fitting, however, we lack training data as a means of assesing the model. Potential future direction would be to test this penalized model on another data set.
 ## Results
 
 ## References
@@ -678,7 +732,4 @@ Curnow, E., Utley, I., Rutherford, M., Johnston, L., & Maciver, D. (2023). Diagn
 
 Hirota, T., & King, B. H. (2023). Autism spectrum Disorder. *JAMA*, *329*(2), 157. https://doi.org/10.1001/jama.2022.23661
 
-Marin, Z. (2021, April 26). GLM fit: Algorithm did not converge – How to fix it. Statology. https://www.statology.org/glm-fit-algorithm-did-not-converge/
-::: callout-important
-Before you submit, make sure your code chunks are turned off with `echo: false` and there are no warnings or messages with `warning: false` and `message: false` in the YAML.
-:::
+Marin, Z. (2021, April 26). GLM fit: Algorithm did not converge – How to fix it. Statology. https://www.statology.org/glm-fit-algorithm-did-not-converge/ ::: callout-important Before you submit, make sure your code chunks are turned off with `echo: false` and there are no warnings or messages with `warning: false` and `message: false` in the YAML. :::
