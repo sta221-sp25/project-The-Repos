@@ -22,6 +22,7 @@ library(patchwork)
 library(knitr)
 library(tibble)
 library(kableExtra)
+library(glmnet)
 
 autism_ds <- read_csv("data/autism_ds.csv") %>%
   mutate(ethnicity = ifelse(ethnicity == "others", "Others", ethnicity))
@@ -628,24 +629,35 @@ From the results of this test, it is evident that the parameters that are statis
 **Fitting the model**
 As said before, an additive logistic regression model of the following form was fitted:
 $$log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_1X_{Q1}+...+\beta_{10}X_{Q10}+\beta_{ethnicity}X_{ethnicity}+\beta_{gender}X_{gender}+\beta_{jaundice}X_{jaundice}$$
-Given that the condition we established for the "high probability" (i.e. total score greater than 6) allows the logistic model to perfectly separate the response variable in the data into "high" and "low" probabiities (thus making the respecttive MLE for $\beta_j$ go to infinity), a penalized logistic regression model (LASSO) was employed
+Given that the condition we established for the "high probability" (i.e. total score greater than 6) allows the logistic model to perfectly separate the response variable in the data into "high" and "low" probabiities (thus making the respective MLE for $\beta_j$ go to infinity), a penalized logistic regression model (LASSO) was employed (Marin, 2021).
 ```{r, echo =FALSE}
-complex_log_mod <- glm(highProb ~ small_sounds +
-                         difficult_to_understand_char +
-                         ease_to_read_between_lines +
-                         focus_on_whole_picture +
-                         i_can_tell_if_someone_bored +
-                         i_can_multi_task +
-                         i_can_tell_feelings_from_faces +
-                         i_can_go_back_to_work_when_interrupted +
-                         i_like_to_collect_info_on_categories +
-                         i_find_it_hard_to_figure_out_others_intentions +
-                         ethnicity +
-                         gender +
-                         jundice
-                         , 
-              data = autism_ds, 
-              family = "binomial")
+X <- model.matrix(highProb ~ 
+                    small_sounds +
+                    difficult_to_understand_char +
+                    ease_to_read_between_lines +
+                    focus_on_whole_picture +
+                    i_can_tell_if_someone_bored +
+                    i_can_multi_task +
+                    i_can_tell_feelings_from_faces +
+                    i_can_go_back_to_work_when_interrupted +
+                    i_like_to_collect_info_on_categories +
+                    i_find_it_hard_to_figure_out_others_intentions +
+                    ethnicity +
+                    gender +
+                    jundice,
+                  data = autism_ds)[, -1]  # Remove intercept column
+
+# Define response variable
+y <- autism_ds$highProb
+
+# Fit lasso logistic regression with cross-validation
+cv_fit <- cv.glmnet(X, y, family = "binomial", alpha = 1)
+
+# Best lambda based on cross-validation
+best_lambda <- cv_fit$lambda.min
+
+# Final lasso model using the best lambda
+final_lasso_model <- glmnet(X, y, family = "binomial", alpha = 1, lambda = best_lambda)
 ```
 ## Results
 
