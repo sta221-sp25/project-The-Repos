@@ -630,7 +630,7 @@ From the results of this test, it is evident that the parameters that are statis
 As said before, an additive logistic regression model of the following form was fitted:
 $$log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_1X_{Q1}+...+\beta_{10}X_{Q10}+\beta_{ethnicity}X_{ethnicity}+\beta_{gender}X_{gender}+\beta_{jaundice}X_{jaundice}$$
 Given that the condition we established for the "high probability" (i.e. total score greater than 6) allows the logistic model to perfectly separate the response variable in the data into "high" and "low" probabiities (thus making the respective MLE for $\beta_j$ go to infinity), a penalized logistic regression model (LASSO) was employed (Marin, 2021).
-```{r, echo =FALSE}
+```{r}
 X <- model.matrix(highProb ~ 
                     small_sounds +
                     difficult_to_understand_char +
@@ -658,6 +658,15 @@ best_lambda <- cv_fit$lambda.min
 
 # Final lasso model using the best lambda
 final_lasso_model <- glmnet(X, y, family = "binomial", alpha = 1, lambda = best_lambda)
+
+tidy(final_lasso_model) |>
+  kable(digits = 3)
+```
+This model was then employed to augment the original data frame and obtain the estimated probabilities for each observation, these would later be employed for an ROC curve to determine the optimal prediction threshold. 
+```{r}
+autism_ds_aug <- autism_ds
+autism_ds_aug$predicted_prob <- predict(final_lasso_model, newx = X, type = "response")
+
 ```
 ## Results
 
