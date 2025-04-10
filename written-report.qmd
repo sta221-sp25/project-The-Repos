@@ -20,14 +20,13 @@ library(tidyverse)
 library(tidymodels)
 library(patchwork)
 library(knitr)
+library(tibble)
+library(kableExtra)
 
 autism_ds <- read_csv("data/autism_ds.csv") %>%
   mutate(ethnicity = ifelse(ethnicity == "others", "Others", ethnicity))
 ```
-
-## Exploratory data analysis
-
-**Introduction**
+## Introduction
 
 Autism Spectrum Disorder (ASD) remains a highly prevalent condition despite modern strides made in medical technology. It is reported that nearly 2.2% of adults are affected by ASD, and growing awareness has led to an uptick in diagnoses, particularly in adults who went undiagnosed early in life (Hirota 2023). However, ASD screening tests for all age groups currently contain significant inaccuracies. For example, the most widely used toddler screening test, CHAT-R/FAs, was recently found to produce false negatives in 25% of cases. In contrast, the most commonly used adult autism screening test – the Autism-Spectrum Quotient (AQ) – was found to have limited predictive value in certain populations (Aishworiya 2023; Curnow 2023). Therefore, it has become critical to identify stronger predictors or explore underlying relationships to have more accurate tests and models to predict ASD in adults.
 
@@ -311,11 +310,10 @@ Interestingly, we can also observe how the relationship between the test taker a
 
 Surprisingly, we can also observe minimal differences in how each gender answered the ten questions, with generally comparable distributions of 'Yes' and 'No'. This may be a point of further investigation as typically women tend to be underdiagnosed relative to men.
 
-## Introduction and Data
-
 ## Methodology
-
-```{r}
+**Choosing Predictors**
+```{r, include = FALSE}
+### Ethnicity DD
 autism_ds <- autism_ds %>%
   mutate(highProb = if_else(result > 6, 1, 0))
 
@@ -324,16 +322,16 @@ reduced_model <- glm(highProb ~ 1,
 ethnicity_model <- glm(highProb ~ ethnicity, 
               data = autism_ds, family = "binomial")
 
-(deviance_reduced <- -2 * glance(reduced_model)$logLik)
-(deviance_full <- -2 * glance(ethnicity_model)$logLik)
-(G <- deviance_reduced - deviance_full)
-pchisq(G, df = 9, lower.tail = FALSE)
+cat("D-reduced:", (deviance_reduced <- -2 * glance(reduced_model)$logLik), "\n")
+cat("D-full:", (deviance_full <- -2 * glance(ethnicity_model)$logLik), "\n")
+cat("G-stat:", (G <- deviance_reduced - deviance_full), "\n")
+cat("p-value:", pchisq(G, df = 9, lower.tail = FALSE), "\n")
 
 tidy(ethnicity_model) |>
   kable(digits = 3)
 ```
-
-```{r}
+```{r, include = FALSE}
+### Relation DD
 autism_ds <- autism_ds %>%
   mutate(highProb = if_else(result > 6, 1, 0))
 
@@ -342,16 +340,16 @@ reduced_model <- glm(highProb ~ 1,
 relation_model <- glm(highProb ~ relation, 
               data = autism_ds, family = "binomial")
 
-(deviance_reduced <- -2 * glance(reduced_model)$logLik)
-(deviance_full <- -2 * glance(relation_model)$logLik)
-(G <- deviance_reduced - deviance_full)
-pchisq(G, df = 4, lower.tail = FALSE)
+cat("D-reduced:",(deviance_reduced <- -2 * glance(reduced_model)$logLik), "\n")
+cat("D-fulll:",(deviance_full <- -2 * glance(relation_model)$logLik), "\n")
+cat("G-stat:",(G <- deviance_reduced - deviance_full), "\n")
+cat("p-value:",pchisq(G, df = 4, lower.tail = FALSE), "\n")
 
 tidy(relation_model) |>
   kable(digits = 3)
 ```
-
-```{r}
+```{r, include = FALSE}
+### Q1
 autism_ds <- autism_ds %>%
   mutate(highProb = if_else(result > 6, 1, 0))
 
@@ -360,14 +358,274 @@ reduced_model <- glm(highProb ~ 1,
 q1_model <- glm(highProb ~ small_sounds, 
               data = autism_ds, family = "binomial")
 
-(deviance_reduced <- -2 * glance(reduced_model)$logLik)
-(deviance_full <- -2 * glance(q1_model)$logLik)
-(G <- deviance_reduced - deviance_full)
-pchisq(G, df = 1, lower.tail = FALSE)
+cat("D-reduced:",(deviance_reduced <- -2 * glance(reduced_model)$logLik), "\n")
+cat("D-full:",(deviance_full <- -2 * glance(q1_model)$logLik), "\n")
+cat("G-stat", (G <- deviance_reduced - deviance_full), "\n")
+cat("p-value:",pchisq(G, df = 1, lower.tail = FALSE), "\n")
 
 tidy(q1_model) |>
   kable(digits = 3)
 ```
+```{r, include = FALSE}
+### Q2
+autism_ds <- autism_ds %>%
+  mutate(highProb = if_else(result > 6, 1, 0))
+
+reduced_model <- glm(highProb ~ 1, 
+              data = autism_ds, family = "binomial")
+ethnicity_model <- glm(highProb ~ small_sounds, 
+              data = autism_ds, family = "binomial")
+
+cat("D-reduced:", (deviance_reduced <- -2 * glance(reduced_model)$logLik), "\n")
+cat("D-full:", (deviance_full <- -2 * glance(ethnicity_model)$logLik), "\n")
+cat("G-stat:", (G <- deviance_reduced - deviance_full), "\n")
+cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
+
+tidy(ethnicity_model) |>
+  kable(digits = 3)
+```
+```{r, include=FALSE}
+### Q3
+autism_ds <- autism_ds %>%
+  mutate(highProb = if_else(result > 6, 1, 0))
+
+reduced_model <- glm(highProb ~ 1, 
+              data = autism_ds, family = "binomial")
+ethnicity_model <- glm(highProb ~ difficult_to_understand_char, 
+              data = autism_ds, family = "binomial")
+
+cat("D-reduced:", (deviance_reduced <- -2 * glance(reduced_model)$logLik), "\n")
+cat("D-full:", (deviance_full <- -2 * glance(ethnicity_model)$logLik), "\n")
+cat("G-stat:", (G <- deviance_reduced - deviance_full), "\n")
+cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
+
+tidy(ethnicity_model) |>
+  kable(digits = 3)
+```
+```{r, include = FALSE}
+###q4
+autism_ds <- autism_ds %>%
+  mutate(highProb = if_else(result > 6, 1, 0))
+
+reduced_model <- glm(highProb ~ 1, 
+              data = autism_ds, family = "binomial")
+ethnicity_model <- glm(highProb ~ ease_to_read_between_lines, 
+              data = autism_ds, family = "binomial")
+
+cat("D-reduced:", (deviance_reduced <- -2 * glance(reduced_model)$logLik), "\n")
+cat("D-full:", (deviance_full <- -2 * glance(ethnicity_model)$logLik), "\n")
+cat("G-stat:", (G <- deviance_reduced - deviance_full), "\n")
+cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
+
+tidy(ethnicity_model) |>
+  kable(digits = 3)
+```
+```{r, include = FALSE}
+###Q5
+autism_ds <- autism_ds %>%
+  mutate(highProb = if_else(result > 6, 1, 0))
+
+reduced_model <- glm(highProb ~ 1, 
+              data = autism_ds, family = "binomial")
+ethnicity_model <- glm(highProb ~ focus_on_whole_picture, 
+              data = autism_ds, family = "binomial")
+
+cat("D-reduced:", (deviance_reduced <- -2 * glance(reduced_model)$logLik), "\n")
+cat("D-full:", (deviance_full <- -2 * glance(ethnicity_model)$logLik), "\n")
+cat("G-stat:", (G <- deviance_reduced - deviance_full), "\n")
+cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
+
+tidy(ethnicity_model) |>
+  kable(digits = 3)
+```
+```{r, include = FALSE}
+##Q6
+autism_ds <- autism_ds %>%
+  mutate(highProb = if_else(result > 6, 1, 0))
+
+reduced_model <- glm(highProb ~ 1, 
+              data = autism_ds, family = "binomial")
+ethnicity_model <- glm(highProb ~ i_can_tell_if_someone_bored, 
+              data = autism_ds, family = "binomial")
+
+cat("D-reduced:", (deviance_reduced <- -2 * glance(reduced_model)$logLik), "\n")
+cat("D-full:", (deviance_full <- -2 * glance(ethnicity_model)$logLik), "\n")
+cat("G-stat:", (G <- deviance_reduced - deviance_full), "\n")
+cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
+
+tidy(ethnicity_model) |>
+  kable(digits = 3)
+```
+```{r, include = FALSE}
+###Q7
+autism_ds <- autism_ds %>%
+  mutate(highProb = if_else(result > 6, 1, 0))
+
+reduced_model <- glm(highProb ~ 1, 
+              data = autism_ds, family = "binomial")
+ethnicity_model <- glm(highProb ~ i_can_multi_task, 
+              data = autism_ds, family = "binomial")
+
+cat("D-reduced:", (deviance_reduced <- -2 * glance(reduced_model)$logLik), "\n")
+cat("D-full:", (deviance_full <- -2 * glance(ethnicity_model)$logLik), "\n")
+cat("G-stat:", (G <- deviance_reduced - deviance_full), "\n")
+cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
+
+tidy(ethnicity_model) |>
+  kable(digits = 3)
+```
+```{r, include = FALSE}
+autism_ds <- autism_ds %>%
+  mutate(highProb = if_else(result > 6, 1, 0))
+
+reduced_model <- glm(highProb ~ 1, 
+              data = autism_ds, family = "binomial")
+ethnicity_model <- glm(highProb ~ i_can_tell_feelings_from_faces, 
+              data = autism_ds, family = "binomial")
+
+cat("D-reduced:", (deviance_reduced <- -2 * glance(reduced_model)$logLik), "\n")
+cat("D-full:", (deviance_full <- -2 * glance(ethnicity_model)$logLik), "\n")
+cat("G-stat:", (G <- deviance_reduced - deviance_full), "\n")
+cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
+
+tidy(ethnicity_model) |>
+  kable(digits = 3)
+```
+```{r, include = FALSE}
+###Q8
+autism_ds <- autism_ds %>%
+  mutate(highProb = if_else(result > 6, 1, 0))
+
+reduced_model <- glm(highProb ~ 1, 
+              data = autism_ds, family = "binomial")
+ethnicity_model <- glm(highProb ~ i_can_go_back_to_work_when_interrupted, 
+              data = autism_ds, family = "binomial")
+
+cat("D-reduced:", (deviance_reduced <- -2 * glance(reduced_model)$logLik), "\n")
+cat("D-full:", (deviance_full <- -2 * glance(ethnicity_model)$logLik), "\n")
+cat("G-stat:", (G <- deviance_reduced - deviance_full), "\n")
+cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
+
+tidy(ethnicity_model) |>
+  kable(digits = 3)
+```
+```{r, include = FALSE}
+###Q9
+autism_ds <- autism_ds %>%
+  mutate(highProb = if_else(result > 6, 1, 0))
+
+reduced_model <- glm(highProb ~ 1, 
+              data = autism_ds, family = "binomial")
+ethnicity_model <- glm(highProb ~ i_like_to_collect_info_on_categories, 
+              data = autism_ds, family = "binomial")
+
+cat("D-reduced:", (deviance_reduced <- -2 * glance(reduced_model)$logLik), "\n")
+cat("D-full:", (deviance_full <- -2 * glance(ethnicity_model)$logLik), "\n")
+cat("G-stat:", (G <- deviance_reduced - deviance_full), "\n")
+cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
+
+tidy(ethnicity_model) |>
+  kable(digits = 3)
+```
+```{r, include = FALSE}
+### Q10
+autism_ds <- autism_ds %>%
+  mutate(highProb = if_else(result > 6, 1, 0))
+
+reduced_model <- glm(highProb ~ 1, 
+              data = autism_ds, family = "binomial")
+ethnicity_model <- glm(highProb ~ i_find_it_hard_to_figure_out_others_intentions, 
+              data = autism_ds, family = "binomial")
+
+cat("D-reduced:", (deviance_reduced <- -2 * glance(reduced_model)$logLik), "\n")
+cat("D-full:", (deviance_full <- -2 * glance(ethnicity_model)$logLik), "\n")
+cat("G-stat:", (G <- deviance_reduced - deviance_full), "\n")
+cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
+
+tidy(ethnicity_model) |>
+  kable(digits = 3)
+```
+```{r, include = FALSE}
+autism_ds <- autism_ds %>%
+  mutate(highProb = if_else(result > 6, 1, 0))
+
+reduced_model <- glm(highProb ~ 1, 
+              data = autism_ds, family = "binomial")
+ethnicity_model <- glm(highProb ~ age, 
+              data = autism_ds, family = "binomial")
+
+cat("D-reduced:", (deviance_reduced <- -2 * glance(reduced_model)$logLik), "\n")
+cat("D-full:", (deviance_full <- -2 * glance(ethnicity_model)$logLik), "\n")
+cat("G-stat:", (G <- deviance_reduced - deviance_full), "\n")
+cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
+
+tidy(ethnicity_model) |>
+  kable(digits = 3)
+```
+```{r, include = FALSE}
+### Gender
+autism_ds <- autism_ds %>%
+  mutate(highProb = if_else(result > 6, 1, 0))
+
+reduced_model <- glm(highProb ~ 1, 
+              data = autism_ds, family = "binomial")
+ethnicity_model <- glm(highProb ~ gender, 
+              data = autism_ds, family = "binomial")
+
+cat("D-reduced:", (deviance_reduced <- -2 * glance(reduced_model)$logLik), "\n")
+cat("D-full:", (deviance_full <- -2 * glance(ethnicity_model)$logLik), "\n")
+cat("G-stat:", (G <- deviance_reduced - deviance_full), "\n")
+cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
+
+tidy(ethnicity_model) |>
+  kable(digits = 3)
+```
+```{r, include = FALSE}
+### Jaundice
+autism_ds <- autism_ds %>%
+  mutate(highProb = if_else(result > 6, 1, 0))
+
+reduced_model <- glm(highProb ~ 1, 
+              data = autism_ds, family = "binomial")
+ethnicity_model <- glm(highProb ~ jundice, 
+              data = autism_ds, family = "binomial")
+
+cat("D-reduced:", (deviance_reduced <- -2 * glance(reduced_model)$logLik), "\n")
+cat("D-full:", (deviance_full <- -2 * glance(ethnicity_model)$logLik), "\n")
+cat("G-stat:", (G <- deviance_reduced - deviance_full), "\n")
+cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
+
+tidy(ethnicity_model) |>
+  kable(digits = 3)
+```
+A drop-in-deviance test between a logistic null model without predictor variables and a logistic model with a single predictor was systematically conducted across all predictor variables as a means of assessing which predictors provide a statistically significant improvemnet in model fit against the null condition. The hypothesis for this test can be observed below:
+$$H_0: \beta_1 = 0$$
+$$H_a: \beta_1 \neq 0$$
+- Table 1: Drop-in-deviance test results comparing null model $log(\frac{\pi}{1-\pi})=\beta_0$ to single-predictor model $log(\frac{\pi}{1-\pi})=\beta_0 + \beta_1X_1$
+```{r, echo = FALSE}
+tribble(
+  ~"Predictor", ~"G-stat", ~"p-value",
+  "Q1",	"62.96",	"2.11x10^-15",
+  "Q2",	"62.96",	"2.11x10^-15",
+  "Q3",	"69.97",	"6.04x10^-17",
+  "Q4",	"121.68",	"2.70x10^-28",
+  "Q5",	"148.94", "2.95x10^-34",
+"Q6",	"217.14",	"3.81x10^-49",
+"Q7", "219.73",	"1.03x10^-49",
+"Q8",	"77.51",	"1.32x10^-18",
+"Q9",	"253.13",	"5.39x10^-57",
+"Q10",	"97.29",	"5.99x10^-23",
+"Age",	"1.54",	"0.22",
+"Ethnicity",	"94.1",	"2.44x10^-16",
+"Relation", "1.21",	"0.87",
+"Gender",	"4.46",	"0.035",
+"Jaundice",	"9.33",	"0.0023"
+) |>
+  kable()
+```
+From the results of this test, it is evident that the parameters that are statistically significant for model fit are Q1-10, ethnicity, gender, and, quite surprisingly, jaundice when compared to a null model as the p-values are either significantly less than 0.05 (Q1-10 + ethnicity) or slighly below it (gender and jaundice). Due to this consideration, the first model to be analyzed will be a simple additive model that takes into account all these predictors. 
+
+**Fitting the model**
 
 ## Results
 
