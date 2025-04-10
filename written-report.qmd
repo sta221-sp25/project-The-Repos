@@ -601,7 +601,7 @@ tidy(ethnicity_model) |>
 A drop-in-deviance test between a logistic null model without predictor variables and a logistic model with a single predictor was systematically conducted across all predictor variables as a means of assessing which predictors provide a statistically significant improvemnet in model fit against the null condition. The hypothesis for this test can be observed below:
 $$H_0: \beta_1 = 0$$
 $$H_a: \beta_1 \neq 0$$
-- Table 1: Drop-in-deviance test results comparing null model $log(\frac{\pi}{1-\pi})=\beta_0$ to single-predictor model $log(\frac{\pi}{1-\pi})=\beta_0 + \beta_1X_1$
+- Table 1: Drop-in-deviance test results comparing null model $log(\frac{\hat\pi}{1-\hat\pi})=\beta_0$ to single-predictor model $log(\frac{\pi}{1-\pi})=\beta_0 + \beta_1X_1$
 ```{r, echo = FALSE}
 tribble(
   ~"Predictor", ~"G-stat", ~"p-value",
@@ -623,10 +623,30 @@ tribble(
 ) |>
   kable()
 ```
-From the results of this test, it is evident that the parameters that are statistically significant for model fit are Q1-10, ethnicity, gender, and, quite surprisingly, jaundice when compared to a null model as the p-values are either significantly less than 0.05 (Q1-10 + ethnicity) or slighly below it (gender and jaundice). Due to this consideration, the first model to be analyzed will be a simple additive model that takes into account all these predictors. 
+From the results of this test, it is evident that the parameters that are statistically significant for model fit are Q1-10, ethnicity, gender, and, quite surprisingly, jaundice when compared to a null model as the p-values are either significantly less than 0.05 (Q1-10 + ethnicity) or slighly below it (gender and jaundice). Due to this consideration, the first model to be analyzed will be a simple additive model that takes into account all these statistically significant predictors. 
 
 **Fitting the model**
-
+As said before, an additive logistic regression model of the following form was fitted:
+$$log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_1X_{Q1}+...+\beta_{10}X_{Q10}+\beta_{ethnicity}X_{ethnicity}+\beta_{gender}X_{gender}+\beta_{jaundice}X_{jaundice}$$
+Given that the condition we established for the "high probability" (i.e. total score greater than 6) allows the logistic model to perfectly separate the response variable in the data into "high" and "low" probabiities (thus making the respecttive MLE for $\beta_j$ go to infinity), a penalized logistic regression model (LASSO) was employed
+```{r, echo =FALSE}
+complex_log_mod <- glm(highProb ~ small_sounds +
+                         difficult_to_understand_char +
+                         ease_to_read_between_lines +
+                         focus_on_whole_picture +
+                         i_can_tell_if_someone_bored +
+                         i_can_multi_task +
+                         i_can_tell_feelings_from_faces +
+                         i_can_go_back_to_work_when_interrupted +
+                         i_like_to_collect_info_on_categories +
+                         i_find_it_hard_to_figure_out_others_intentions +
+                         ethnicity +
+                         gender +
+                         jundice
+                         , 
+              data = autism_ds, 
+              family = "binomial")
+```
 ## Results
 
 ## References
@@ -637,6 +657,7 @@ Curnow, E., Utley, I., Rutherford, M., Johnston, L., & Maciver, D. (2023). Diagn
 
 Hirota, T., & King, B. H. (2023). Autism spectrum Disorder. *JAMA*, *329*(2), 157. https://doi.org/10.1001/jama.2022.23661
 
+Marin, Z. (2021, April 26). GLM fit: Algorithm did not converge – How to fix it. Statology. https://www.statology.org/glm-fit-algorithm-did-not-converge/
 ::: callout-important
 Before you submit, make sure your code chunks are turned off with `echo: false` and there are no warnings or messages with `warning: false` and `message: false` in the YAML.
 :::
