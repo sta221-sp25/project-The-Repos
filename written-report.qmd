@@ -25,6 +25,8 @@ library(kableExtra)
 library(glmnet)
 library(pROC)
 library(car)
+library(corrplot)
+library(ggcorrplot)
 
 autism_ds <- read_csv("data/autism_ds.csv") %>%
   mutate(ethnicity = ifelse(ethnicity == "others", "Others", ethnicity))
@@ -492,15 +494,92 @@ tribble(
   kable()
 ```
 
-From the results of this test, it is evident that the parameters that are statistically significant for model fit are ethnicity, gender, and, quite surprisingly, neonatal jaundice when compared to a null model as the p-values are either significantly less than 0.05 (Q1-10 + ethnicity) or slighly below it (gender and jaundice). We also note that there appears to be strong correlation between answers to questions 5, 7, and 10, and also questions 6 and 8. Due to this consideration, the first model to be analyzed will be a simple additive model that takes into account all these statistically significant predictors.
+From the results of this test, it is evident that the parameters that are statistically significant for model fit are ethnicity, gender, and, quite surprisingly, neonatal jaundice when compared to a null model as the p-values are either significantly less than 0.05 (Q1-10 + ethnicity) or slightly below it (gender and jaundice). We also note that there appears to be strong correlation between answers to questions 5, 7, and 10. Due to this consideration, the first model to be analyzed will be a simple additive model that takes into account all these statistically significant predictors.
 
-It is also worth noting that as Q1-10 are very much correlated to the score and thus the classification of a high score for an individual and will not be assessed as predictors; however we will perform an additional analysis to determine if any specific one of these questions is responsible for this disparity in score distributions across ethnicity, gender, and neonatal jaundice.
+```{r}
+q1_to_10 <- autism_ds |>
+  select(small_sounds, difficult_to_understand_char,
+         ease_to_read_between_lines,
+         focus_on_whole_picture,
+         i_can_tell_if_someone_bored,
+         i_can_multi_task,
+         i_can_tell_feelings_from_faces,
+         i_can_go_back_to_work_when_interrupted,
+         i_like_to_collect_info_on_categories,
+         i_find_it_hard_to_figure_out_others_intentions)
 
-**Fitting the model** an additive logistic regression model of the following form will be fitted: $$log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_{ethnicity}X_{ethnicity}+\beta_{gender}X_{gender}+\beta_{jaundice}X_{jaundice}$$
+cor_matrix <- cor(q1_to_10, method = "pearson", use = "complete.obs")
+
+short_names <- c(
+  "Q1", "Q2", "Q3", "Q4", "Q5",
+  "Q6", "Q7", "Q8", "Q9", "Q10"
+)
+
+colnames(cor_matrix) <- short_names
+rownames(cor_matrix) <- short_names
+
+corrplot(cor_matrix,
+         method = "color",
+         type = "upper",
+         tl.col = "black",
+         tl.cex = 1,
+         addCoef.col = "black",
+         number.cex = 0.7,
+         diag = FALSE)
+```
+
+By computing a correlation heatmap among the ten behavior questions to check multicollinearity, we note that Q8 is the least correlated to other questions, which is `i_can_go_back_to_work_when_interrupted`. Therefore, we consider adding this to the model.
+
+**Fitting the model**
+
+An additive logistic regression model of the following form will be fitted:
+
+$$log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_{ethnicity}X_{ethnicity}+\beta_{gender}X_{gender}+\beta_{jaundice}X_{jaundice}$$
 
 Given that the condition we established for the "high probability" (i.e. total score greater than 6) allows the logistic model to perfectly separate the response variable in the data into "high" and "low" probabiities (thus making the respective MLE for $\beta_j$ go to infinity), a penalized logistic regression model (LASSO) was employed (Marin, 2021).
 
 ```{r}
+model_one_fit <- glm(highProb ~ 
+                       ethnicity + gender + jundice,
+                       data = autism_ds, 
+                       family = binomial)
+model_one_fit |>
+  tidy() |>
+  kable(digits = 3)
+```
+
+Then to consider adding the behavior question Q8 or not, we first fit as following
+
+$$log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_{ethnicity}X_{ethnicity}+\beta_{gender}X_{gender}+\beta_{jaundice}X_{jaundice}+\beta_{Q8}X_{Q8}$$
+
+```{r}
+model_two_fit <- glm(highProb ~ 
+                       ethnicity + gender + jundice + 
+                       i_can_go_back_to_work_when_interrupted,
+                       data = autism_ds, 
+                       family = binomial)
+
+model_two_fit |>
+  tidy() |>
+  kable(digits = 3)
+
+AIC(model_one_fit, model_two_fit)
+BIC(model_one_fit, model_two_fit)
+```
+
+To compare the two models, where model one does not include the variable `i_can_go_back_to_work_when_interrupted` and model two does, both AIC and BIC of model two are smaller than the values of model one. Therefore, we choose model two.
+
+The intercept means that for a test taker who is an Asian woman, was not born with jaundice, indicate on the questionnaire that they can go back to work after being interrupted, the odds of such a person to have a high probability of autism are expected to be 0.05 (calculated from (exp(-2.989))).
+
+The coefficients of ethnicity are compared to the baseline group, which is Asian. For instance, for the coefficient of `ethnicityBlack`, it means that the odds of someone identified as Black to have a high probability of autism are expected to be 6.1 (calculated from exp(1.808)) times the odds of someone identified as Asian, holding all else constant.
+
+The odds of a man to have a high probability of autism are expected to be 0.68 (calculated from exp(-0.382)) times the odds of a woman, holding all else constant.
+
+The odds of someone who was born with jaundice to have a high probability of autism are expected to be 2.085(calculated from exp(0.735)) times the odds of someone who was not born with jaundice, holding all else constant.
+
+The odds of someone who indicates that they can go back to work after being interrupted to have a high probability of autism are expected to be 4.83 (calculated from exp(1.574)) times the odds of someone who indicates that they cannot go back to work after being interrupted, holding all else constant.
+
+```{r, echo = FALSE}
 complex_log_mod <- glm(highProb ~ 
                          ethnicity +
                          gender +
@@ -532,8 +611,7 @@ tidy(final_lasso_model) |>
 Considering the closely related questions regarding sensory and behavioral tendencies, multicollinearity is a major concern. Subsequently, a VIF test was conducted as a means of evaluating multicollinearity.
 
 ```{r}
-vif(complex_log_mod) |>
-  kable(digits = 3)
+vif(model_two_fit)
 ```
 
 This model was then employed to augment the original data frame and obtain the estimated probabilities for each observation, these would later be employed for an ROC curve to determine the optimal prediction threshold.
@@ -557,9 +635,7 @@ plot(roc_curve, main = "ROC Curve", col = "blue", lwd = 2)
 auc(roc_curve)
 ```
 
-The area under the curve is 0.7364, which for a model fitted to demographic data independent of questions on the quiz, indicates that further investigation into how these questions may over- or under-diagnose certain populations would be worth pursuing. We now observe the following relationships between some correlated sets of questions (i.e., 5,7, 10, and 6, 8) and ethnicity:
-
-\[Analysis of relationship between ethnicity and answers to these questions\]
+The area under the curve is 0.7364, which for a model fitted to demographic data independent of questions on the quiz, indicates that further investigation into how these questions may over- or under-diagnose certain populations would be worth pursuing.
 
 ## References
 

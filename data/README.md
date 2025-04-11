@@ -10,7 +10,7 @@ We are sourcing our data from a project created by Prof. Fadi Fayez Thabtah of t
 | age | Age in years |
 | gender | Male or Female |
 | ethnicity | List of common ethnicities in text format |
-| jaundice | Whether the case was born with jaundice |
+| jundice | Whether the case was born with jaundice |
 | autism | Whether any immediate family member has Pervasive developmental disorders |
 | relation | Parent, self, caregiver, medical staff, clinician, etc. |
 | country_of_res  | List of countries in text format |
