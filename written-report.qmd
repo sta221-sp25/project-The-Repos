@@ -567,7 +567,7 @@ AIC(model_one_fit, model_two_fit)
 BIC(model_one_fit, model_two_fit)
 ```
 
-To compare the two models, where model one does not include the variable `i_can_go_back_to_work_when_interrupted` and model two does, both AIC and BIC of model two are smaller than the values of model one. Therefore, we choose model two.
+To compare the two models, where model one does not include the variable for Q8 and model two does, both AIC and BIC of model two are smaller than the values of model one. Therefore, we choose model two.
 
 The intercept means that for a test taker who is an Asian woman, was not born with jaundice, indicate on the questionnaire that they can go back to work after being interrupted, the odds of such a person to have a high probability of autism are expected to be 0.05 (calculated from (exp(-2.989))).
 
