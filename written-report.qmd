@@ -27,6 +27,7 @@ library(pROC)
 library(car)
 library(corrplot)
 library(ggcorrplot)
+library(Stat2Data)  #empirical logit plots
 
 autism_ds <- read_csv("data/autism_ds.csv") %>%
   mutate(ethnicity = ifelse(ethnicity == "others", "Others", ethnicity))
@@ -653,7 +654,45 @@ The area under the curve is 0.795, which for a model fitted to demographic data 
 
 ## Results
 
+```{r}
+final_model_fit <- glm(highProb ~ 
+                       ethnicity + gender + jundice + 
+                       i_can_go_back_to_work_when_interrupted,
+                       data = autism_ds, 
+                       family = binomial)
+
+final_model_fit |>
+  tidy() |>
+  kable(digits = 3)
+
+final_model_fit_aug <- augment(final_model_fit)
+
+pred_prob <- predict.glm(final_model_fit, type = "response")
+
+final_model_fit_aug <- final_model_fit_aug |>
+  mutate(
+    highProb = factor(highProb, levels = c(0, 1))  # 1 = "event", 0 = "non-event"
+  )
+
+final_model_fit_aug <- final_model_fit_aug |> 
+  bind_cols(pred_prob = pred_prob)
+
+roc_curve <- final_model_fit_aug |>
+  roc_curve(highProb, pred_prob,
+            event_level = "second")
+
+autoplot(roc_curve) +
+  ggplot2::ggtitle("ROC")
+
+final_model_fit_aug |>
+  roc_auc(highProb, pred_prob,
+    event_level = "second"
+  )
+```
+
 As previously discussed, the logistic regression model for determining the probability of a high score on the ASD questionnaire possesses a 0.795 AUC with predictors of demographic data and specifically question #8. This is a fairly high AUC given the context of primarily relying on demographic data rather than actual behaviors For model assumptions, logistic regression requires the assumption of log-odds possessing linearity, randomness, and independence of observations. It is worth noting that of these conditions, randomness is not necessarily satisfied due to the nature of the data set – it was collected by people who already were likely to suspect an ASD diagnosis, as they are those who took the test voluntarily. However, our other two assumptions are likely to hold for this model, and we still determine it worth further investigation.
+
+We would check linearity as below, noting that independence is likely to be satisfied and does not require further investigation, but as none of our predictors are quantitative and our all categorical, we instead do not need to.
 
 Once more, a .795 AUC for factors primarily inddependent of autistic behaviors indicate that further research is required in the diagnostic criteria and formulation of questionnaires of for autism. It is worth ensuring that everyone can receive the appropriate diagnosis, and thus, plan for accommodations for improvement of quality of life.
 
