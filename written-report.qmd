@@ -316,11 +316,13 @@ Interestingly, we can also observe how the relationship between the test taker a
 
 Surprisingly, we can also observe minimal differences in how each gender answered the ten questions, with generally comparable distributions of 'Yes' and 'No'. This may be a point of further investigation as typically women tend to be underdiagnosed relative to men.
 
+This initial exploration leads us to investigate one of these questions further, and particularly how our demographic data may impact the probability of being encouraged to seek a formal diagnosis. Though we cannot identify a definitive answer of whether it is due to social or cultural perceptions of autism within these subgroups or true difference in rates of its presence, it is worth identifying whether over- or under-diagnosis for certain subgroups is possible.
+
 ## Methodology
 
 **Choosing Predictors**
 
-```{r, include = FALSE}
+```{r}
 #TODO: check for redundancy of mutating the highProb column and the usage of the reduced model for some of our features
 
 ### Ethnicity DD
@@ -341,7 +343,7 @@ tidy(ethnicity_model) |>
   kable(digits = 3)
 ```
 
-```{r, include = FALSE}
+```{r}
 ### Relation DD
 autism_ds <- autism_ds %>%
   mutate(highProb = if_else(result > 6, 1, 0))
@@ -360,7 +362,7 @@ tidy(relation_model) |>
   kable(digits = 3)
 ```
 
-```{r, include = FALSE}
+```{r}
 ### Q5, Q7 predictive relationship
 q5_model <- glm(i_can_tell_if_someone_bored ~ 1, 
               data = autism_ds, family = "binomial")
@@ -405,7 +407,7 @@ tidy(q710_model) |>
   kable(digits = 3)
 ```
 
-```{r, include = FALSE}
+```{r}
 ### Q6, Q8 predictive relationship
 q6_model <- glm(i_can_go_back_to_work_when_interrupted ~ 1, 
               data = autism_ds, family = "binomial")
@@ -421,7 +423,7 @@ tidy(q68_model) |>
   kable(digits = 3)
 ```
 
-```{r, include = FALSE}
+```{r}
 ## Age
 autism_ds <- autism_ds %>%
   mutate(highProb = if_else(result > 6, 1, 0))
@@ -440,7 +442,7 @@ tidy(age_model) |>
   kable(digits = 3)
 ```
 
-```{r, include = FALSE}
+```{r}
 ### Gender
 autism_ds <- autism_ds %>%
   mutate(highProb = if_else(result > 6, 1, 0))
@@ -459,7 +461,7 @@ tidy(gender_model) |>
   kable(digits = 3)
 ```
 
-```{r, include = FALSE}
+```{r}
 ### Jaundice
 autism_ds <- autism_ds %>%
   mutate(highProb = if_else(result > 6, 1, 0))
@@ -480,21 +482,7 @@ tidy(jaundice_model) |>
 
 A drop-in-deviance test between a logistic null model without predictor variables and a logistic model with a single predictor was systematically conducted across ethnicity, gender, presence of neonatal jaundice, and relationship as a means of assessing which predictors provide a statistically significant improvement in model fit against the null condition. The hypothesis for this test can be observed below, where $\beta_1$ represents the coefficient for the associated predictor variable: $$H_0: \beta_1 = 0$$ $$H_a: \beta_1 \neq 0$$ - Table 1: Drop-in-deviance test results comparing null model $log(\frac{\hat\pi}{1-\hat\pi})=\beta_0$ to single-predictor model $log(\frac{\pi}{1-\pi})=\beta_0 + \beta_1X_1$
 
-```{r, echo = FALSE}
-# TODO: update tribble values
-
-tribble(
-  ~"Predictor", ~"G-stat", ~"p-value",
-"Age",	"1.54",	"0.22",
-"Ethnicity",	"94.1",	"2.44x10^-16",
-"Relation", "1.21",	"0.87",
-"Gender",	"4.46",	"0.035",
-"Jaundice",	"9.33",	"0.0023"
-) |>
-  kable()
-```
-
-From the results of this test, it is evident that the parameters that are statistically significant for model fit are ethnicity, gender, and, quite surprisingly, neonatal jaundice when compared to a null model as the p-values are either significantly less than 0.05 (Q1-10 + ethnicity) or slightly below it (gender and jaundice). We also note that there appears to be strong correlation between answers to questions 5, 7, and 10. Due to this consideration, the first model to be analyzed will be a simple additive model that takes into account all these statistically significant predictors.
+From the results of this test, it is evident that the parameters that are statistically significant for model fit are ethnicity, gender, and, quite surprisingly, neonatal jaundice when compared to a null model as the p-values are either significantly less than 0.05 (as in ethnicity) or slightly below it (gender and jaundice). We also note that there appears to be strong correlation between answers to questions 5, 7, and 10. Due to this consideration, the first model to be analyzed will be a simple additive model that takes into account all these statistically significant predictors.
 
 ```{r}
 q1_to_10 <- autism_ds |>
@@ -530,7 +518,7 @@ corrplot(cor_matrix,
 
 By computing a correlation heatmap among the ten behavior questions to check multicollinearity, we note that Q8 is the least correlated to other questions, which is `i_can_go_back_to_work_when_interrupted`. Therefore, we consider adding this to the model.
 
-**Fitting the model**
+**Fitting the Model**
 
 An additive logistic regression model of the following form will be fitted:
 
@@ -548,7 +536,7 @@ model_one_fit |>
   kable(digits = 3)
 ```
 
-Then to consider adding the behavior question Q8 or not, we first fit as following
+Then to consider adding the behavioral question Q8 or not, we first fit as following
 
 $$log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_{ethnicity}X_{ethnicity}+\beta_{gender}X_{gender}+\beta_{jaundice}X_{jaundice}+\beta_{Q8}X_{Q8}$$
 
@@ -661,7 +649,13 @@ model_two_fit_aug |>
   )
 ```
 
-The area under the curve is 0.795, which for a model fitted to demographic data independent of questions on the quiz, indicates that further investigation into how these questions may over- or under-diagnose certain populations would be worth pursuing.
+The area under the curve is 0.795, which for a model fitted to demographic data and only one question on the quiz, indicates that further investigation into how these questions may over- or under-diagnose certain populations would be worth pursuing.
+
+## Results
+
+As previously discussed, the logistic regression model for determining the probability of a high score on the ASD questionnaire possesses a 0.795 AUC with predictors of demographic data and specifically question #8. This is a fairly high AUC given the context of primarily relying on demographic data rather than actual behaviors For model assumptions, logistic regression requires the assumption of log-odds possessing linearity, randomness, and independence of observations. It is worth noting that of these conditions, randomness is not necessarily satisfied due to the nature of the data set – it was collected by people who already were likely to suspect an ASD diagnosis, as they are those who took the test voluntarily. However, our other two assumptions are likely to hold for this model, and we still determine it worth further investigation.
+
+Once more, a .795 AUC for factors primarily inddependent of autistic behaviors indicate that further research is required in the diagnostic criteria and formulation of questionnaires of for autism. It is worth ensuring that everyone can receive the appropriate diagnosis, and thus, plan for accommodations for improvement of quality of life.
 
 ## References
 
