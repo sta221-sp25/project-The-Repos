@@ -44,55 +44,59 @@ The test scores were slightly right-skewed with no significant outliers, and des
 **Univariate EDA**
 
 ```{r}
+summary(autism_ds$result)
+nrow(autism_ds[autism_ds$'Class/ASD' == 'YES', ])/nrow(autism_ds)
+```
+
+```{r fig.width=5, fig.height=3.5}
 #|echo: false
 #|warning: false
 #|message: false
-summary(autism_ds$result)
-
 autism_ds |>
   ggplot(aes(x = result)) +
-  geom_bar() +
+  geom_bar(fill = "skyblue") +
   scale_x_continuous(breaks = seq(0, 10, 1), 
                      labels = as.character(seq(0, 10, 1))) +
   labs(x = "Score",
        y = "Count",
-       title = "Histogram of Scoring Result")
-
-nrow(autism_ds[autism_ds$'Class/ASD' == 'YES', ])/nrow(autism_ds)
+       title = "Histogram of Scores") + 
+  theme_minimal()
 ```
 
-As we can see as a quick summary of our data, the variable we are most interested in – the final score of users – ranges from 0 to 10, which makes sense as there are 10 questions that can be answered either 'Yes' or 'No'. Generally, the scores are a bit right-skewed, with a single peak around 4 or 5 points. The mean is found to be 5.077 points, and the median is 5 points, which is relatively high given that a score of higher than 6 warrants further investigation into a diagnosis. However, as suspecting a diagnosis is reason to take a test in the first place, that is a reasonable reflection of the population taking this test. We then observe that roughly 30% of test takers are encouraged to seek a diagnosis, due to a score higher than 6. We also observe the IQR to be 4 points, as most test takers have a score between 3 and 7 points inclusive. This is a reasonable spread in the context of the potential values, and in this context, no outliers exist.
+As we can see in a quick summary of our data, the variable we are most interested in – the final score of users – ranges from 0 to 10, which makes sense as 10 questions can be answered either 'Yes' or 'No'. Generally, the scores are a bit right-skewed, with a single peak around 4 or 5 points. The mean score is 5.077, and the median is 5, both of which are relatively high considering that scores above 6 warrant further diagnostic evaluation. However, because suspecting a diagnosis is a reason for taking the test, these statistics are reasonable reflections of the test-taking population. We then observe that roughly 30% of test takers are encouraged to seek a diagnosis due to a score higher than 6. We also observe the IQR to be 4 points, as most test takers have a score between 3 and 7 points inclusive. In the context of the data, such a spread is reasonable, and no outliers exist.
 
-```{r}
+```{r fig.width=5, fig.height=3.3}
 #|echo: false
 #|warning: false
 #|message: false
 autism_ds |>
   ggplot(aes(x = `Class/ASD`)) +
-  geom_bar() +
+  geom_bar(fill = "skyblue") +
   labs(x = "Test Result",
        y = "Count",
-       title = "Distribution of Whether or not Result Indicative of Autism")
+       title = "Distribution of Autism Screening Results") +
+  theme_minimal()
 ```
 
-Additionally, here is a visual demonstration of the number of test takers receiving further encouragement to pursue a professional diagnosis of ASD. Though still significantly less than those not encouraged, a notable proportion of test takers were informed they had traits or behaviors indicative of autism.
+Furthermore, the chart above provides a visual representation of test takers advised to pursue further professional evaluation for ASD. A notable proportion of test takers were informed they had traits or behaviors indicative of autism, though the count is still significantly less than those not encouraged.
 
-```{r}
+```{r fig.width=5, fig.height=3.3}
 #|echo: false
 #|warning: false
 #|message: false
 autism_ds |>
-  ggplot(aes(x = ethnicity)) +
-  geom_bar() +
+  ggplot(aes(x = fct_infreq(ethnicity))) +
+  geom_bar(fill = "skyblue") +
   labs(x = "Ethnicity",
        y = "Count",
-       title = "Distribution of Ethnicity in the Dataset") +
+       title = "Distribution of Ethnicity") +
+  theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-We observe here that the most common ethnicity was White-Europeans, with over 200 observations in our data set. Secondly and thirdly, we observe the Asian and Middle Eastern populations to be above 100 and slightly below 100 observations, respectively. All other ethnicities have less than 50 observations in our data set, meaning it may be more difficult to draw conclusions about these populations. We can now check and see how the percentages of being encouraged to seek a diagnosis differ by ethnicity:
+We observe here that the most common ethnicity was White-Europeans, with over 200 observations in our dataset. Secondly and thirdly, we observe the Asian and Middle Eastern populations to be above 100 and slightly below 100 observations, respectively. All other ethnicities have fewer than 50 observations in our data set, suggesting it may be more difficult to conclude about these populations. We can now check whether the percentage of individuals encouraged to seek a diagnosis varies by ethnicity:
 
-```{r}
+```{r fig.width=5, fig.height=3.3}
 #|echo: false
 #|warning: false
 #|message: false
@@ -101,40 +105,82 @@ autism_ds %>%
   summarize(yes_count = sum(`Class/ASD` == "YES"),
             total_count = n(),
             proportion_yes = yes_count / total_count) %>%
-  ggplot(aes(x = ethnicity, y = proportion_yes)) +
-  geom_col() +
+  ggplot(aes(x = fct_reorder(ethnicity, proportion_yes, .desc=TRUE), y = proportion_yes)) +
+  geom_col(fill = "skyblue") +
   labs(x = "Ethnicity",
-       y = "Proportion of Test Scores",
-       title = "Proportion of Indicative Test Scores") +
+       y = "Proportion of Test Scores Indicative of ASD",
+       title = "Proportion of Indicative Test Scores by Ethnicity") +
+  theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-As we can see here, the population with the highest proportion of test takers receiving a high test score was the Latino population, with close to half achieving higher than a 6. Since this is a comparably uncommon population in our data set, it does raise questions of whether it is indicative of the greater Latino population or merely due to the smaller sample size in our data set. Additionally, the White-European, Black, and Hispanic populations also demonstrate a greater proportion of high test scores. The variation in these proportions according to ethnicity warrants further exploration for how the distribution of test scores differs by ethnicity as well.
+As we can see here, the population with the highest proportion of test takers receiving a high test score was the Latino population, with close to half achieving a score higher than a 6. Since this is a comparably uncommon population in our data set, it does raise questions of whether it is indicative of the greater Latino population or merely due to the smaller sample size in our data set. Additionally, the White-European, Black, and Hispanic populations also demonstrate a greater proportion of high test scores. The variation in these proportions according to ethnicity also warrants further exploration into how the distribution of test scores differs by ethnicity.
 
 ```{r}
+summary(autism_ds$age)
+```
+
+```{r, fig.width=5, fig.height=3.5}
 #|echo: false
 #|warning: false
 #|message: false
 autism_ds |>
   ggplot(aes(x = age)) +
-  geom_bar() +
+  geom_bar(fill = "skyblue") +
   labs(x = "Age",
        y = "Count",
-       title = "Distribution of Age in the Dataset") +
-  xlim(10, 75)
-summary(autism_ds$age)
-
-autism_ds |>
-  ggplot(aes(x = `i_can_go_back_to_work_when_interrupted`)) +
-  geom_bar() +
-  labs(x = "Whether or not continue working after interrupted",
-       y = "Count",
-       title = "Distribution of the Ability to Return to Work after Interruption")
+       title = "Distribution of Age") +
+  xlim(10, 75) + 
+  theme_minimal()
 ```
 
-Generally, we observe the distribution of ages to possess a strong right-skewness, with a mean age of 30.22 and a median age of 27. There is a clear peak in the distribution roughly around early to mid 20's years of age. The ages possess a minimum of 17 up to a maximum age of 383, which is clearly a false observation that needs to be filtered from the data. The IQR is 13 years, which is a fairly small spread given the range of ages, as we observe that it seems the majority of test-takers are under 30 years old.
+Generally, we observe the distribution of ages to possess a strong right-skewness, with a mean age of 30.22 and a median age of 27. There is a clear peak in the age distribution roughly around the early to mid-20s. The ages range from a minimum of 17 to a maximum of 383 – a false observation that should be filtered from the data. The IQR is 13 years, which is a fairly small spread given the range of ages, as we observe that the majority of test-takers are under 30 years old.
 
-Additionally, as a brief glance at one of the ten questions on the test, we see that "the ability to continue working after an interruption" question had majority of test takers indicate that this was an area of difficulty, which acts as a potential indicator for ASD.
+```{r, fig.height=6, fig.width=7}
+#|echo: false
+#|warning: false
+#|message: false
+autism_ds |>
+  mutate(
+    small_sounds = if_else(small_sounds == 1, "Yes", "No"),
+    difficult_to_understand_char = if_else(difficult_to_understand_char == 1, "Yes", "No"),
+    ease_to_read_between_lines = if_else(ease_to_read_between_lines == 1, "Yes", "No"),
+    focus_on_whole_picture = if_else(focus_on_whole_picture == 1, "Yes", "No"),
+    i_can_tell_if_someone_bored = if_else(i_can_tell_if_someone_bored == 1, "Yes", "No"),
+    i_can_multi_task = if_else(i_can_multi_task == 1, "Yes", "No"),
+    i_can_tell_feelings_from_faces = if_else(i_can_tell_feelings_from_faces == 1, "Yes", "No"),
+    i_can_go_back_to_work_when_interrupted = if_else(i_can_go_back_to_work_when_interrupted == 1, "Yes", "No"),
+    i_like_to_collect_info_on_categories = if_else(i_like_to_collect_info_on_categories == 1, "Yes", "No"),
+    i_find_it_hard_to_figure_out_others_intentions = if_else(i_find_it_hard_to_figure_out_others_intentions == 1, "Yes", "No")
+  ) |>
+  rename(
+    `Small Sounds` = small_sounds,
+    `Hard to Understand Characters` = difficult_to_understand_char,
+    `Reads Between the Lines Easily` = ease_to_read_between_lines,
+    `Focuses on Whole Picture` = focus_on_whole_picture,
+    `Can Tell If Someone's Bored` = i_can_tell_if_someone_bored,
+    `Can Multitask` = i_can_multi_task,
+    `Can Read Feelings From Faces` = i_can_tell_feelings_from_faces,
+    `Resumes Work After Interruption` = i_can_go_back_to_work_when_interrupted,
+    `Likes to Collect Category Info` = i_like_to_collect_info_on_categories,
+    `Finds It Hard to Read Intentions` = i_find_it_hard_to_figure_out_others_intentions
+  ) |>
+  select("Small Sounds":"Finds It Hard to Read Intentions") |>
+  pivot_longer(everything(), names_to = "question", values_to = "response") |>
+  ggplot(aes(x = question, fill = response)) +
+  geom_bar(position = "fill") +
+  labs(
+    x = "Question",
+    y = "Proportion",
+    title = "Distribution of Yes/No Responses to Autism Screening Questions",
+    fill = "Response"
+  ) +
+  scale_fill_viridis_d() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+The two questions with the highest proportion of "Yes" responses were "resume work after interruption" and "small sounds," suggesting that these behaviors are common among respondents. On the other hand, the questions "can multitask" and "likes to collect category info" had noticeably lower "Yes" responses, potentially indicating difficulties in such areas. Most questions, however, had roughly even proportions between "Yes" and "No" responses.
 
 **Bivariate EDA**
 
@@ -149,11 +195,12 @@ ggplot(autism_ds,
            fill = ethnicity)) +
   geom_boxplot() +
   labs(
-    title = "Distribution of Scores Across Ethnicity",
+    title = "Scores Distributions Across Ethnicity",
     x = "Score",
-    y = "Ethnicity"
+    y = "Ethnicity",
+    fill = "Ethnicity"
   ) +
-  theme_gray()
+  theme_minimal()
 
 ggplot(autism_ds, 
        aes(x = result,
@@ -161,12 +208,12 @@ ggplot(autism_ds,
            fill = relation)) +
   geom_violin(alpha = 0.5) +
   labs(
-    title = "Distribution of Scores Across Person Filling Test",
+    title = "Score Distribution by Respondent Type",
     x = "Score",
     y = "Relation",
     fill
   ) +
-  theme_gray()
+  theme_minimal()
 
 Q1 <- ggplot(autism_ds, 
        aes(x = small_sounds,
@@ -301,13 +348,13 @@ ggplot(autism_ds |> filter(age < 200), aes(
   x = age,
   y = result
 )) +
-  geom_point() +
+  geom_point(color = "skyblue") +
   labs(
-    title = "Points in Test vs. Age",
+    title = "Score By Age",
     x = "Age",
     y = "Score"
   ) +
-  theme_gray()
+  theme_minimal()
 
 ```
 
