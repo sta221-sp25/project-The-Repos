@@ -694,7 +694,7 @@ As previously discussed, the logistic regression model for determining the proba
 
 We would check linearity as below, noting that independence is likely to be satisfied and does not require further investigation, but as none of our predictors are quantitative and our all categorical, we instead do not need to.
 
-Once more, a .795 AUC for factors primarily inddependent of autistic behaviors indicate that further research is required in the diagnostic criteria and formulation of questionnaires of for autism. It is worth ensuring that everyone can receive the appropriate diagnosis, and thus, plan for accommodations for improvement of quality of life.
+Once more, a .795 AUC for factors primarily independent of autistic behaviors indicate that further research is required in the diagnostic criteria and formulation of questionnaires of for autism. It is worth ensuring that everyone can receive the appropriate diagnosis, and thus, plan for accommodations for improvement of quality of life.
 
 ## References
 
