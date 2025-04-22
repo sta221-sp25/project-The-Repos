@@ -3,19 +3,10 @@ title: "Written Report on Factors that Help Diagnose Autism"
 author: "The Repos - Jeffrey Bohrer, Alexandra Green, Anna Zhang, Kevin Lee"
 date: "March 20, 2025"
 format: pdf
-execute: 
-  warning: false
-  message: false
-  echo: false
 editor: visual
 ---
 
-```{r}
-#|echo: false
-#|warning: false
-#|message: false
-#| label: load packages and data
-
+```{r, echo=FALSE, message = FALSE}
 library(tidyverse)
 library(tidymodels)
 library(patchwork)
@@ -33,24 +24,22 @@ autism_ds <- read_csv("data/autism_ds.csv") %>%
   mutate(ethnicity = ifelse(ethnicity == "others", "Others", ethnicity))
 ```
 
-## Introduction
+**I. Introduction**
 
 Autism Spectrum Disorder (ASD) remains a highly prevalent condition despite modern strides made in medical technology. It is reported that nearly 2.2% of adults are affected by ASD, and growing awareness has led to an uptick in diagnoses, particularly in adults who went undiagnosed early in life (Hirota 2023). However, ASD screening tests for all age groups currently contain significant inaccuracies. For example, the most widely used toddler screening test, CHAT-R/FAs, was recently found to produce false negatives in 25% of cases. In contrast, the most commonly used adult autism screening test – the Autism-Spectrum Quotient (AQ) – was found to have limited predictive value in certain populations (Aishworiya 2023; Curnow 2023). Therefore, it has become critical to identify stronger predictors or explore underlying relationships to have more accurate tests and models to predict ASD in adults.
 
 In this study, we will focus on identifying the features that most greatly affect the probability of being encouraged to pursue a diagnosis within this particular questionaire, as created by Prof. Fadi Thabtau of the Manukau Institute of Technology. The data was sourced from users of his app, ASDTests, which screens its users for potential indicators of autism using a ten-question survey. The data set being used will contain ten characteristics along with the answers of each individual to this survey. Because ASD is difficult to identify and can significantly impair an individual's quality of life, understanding the relationship between demographics, certain behaviors, and their association with autism could encourage individuals to seek diagnosis and gain the self-understanding they need. These adults who receive a positive diagnosis can then access the necessary resources for support. Our goal is to identify which aspects of this questionnaire are most closely associated with being encouraged to pursue an autism diagnosis.
+\newpage
+**i. Univariate EDA**
 
-**Univariate EDA**
-
-```{r}
-summary(autism_ds$result)
+```{r, include =FALSE}
+as.data.frame(as.matrix(summary(autism_ds$result)))%>%
+  kable(digits = 3)
 prop_high_scores <- nrow(autism_ds[autism_ds$'Class/ASD' == 'YES', ])/nrow(autism_ds)
-prop_high_scores
+cat("Proportion of scores indicative:", round(prop_high_scores, 3), "\n")
 ```
 
-```{r fig.width=5, fig.height=3.5}
-#|echo: false
-#|warning: false
-#|message: false
+```{r, echo=FALSE, message = FALSE, fig.cap="Distribution of total scores across dataset", fig.height=1.5, fig.width=5.5}
 autism_ds |>
   ggplot(aes(x = result)) +
   geom_bar(fill = "skyblue") +
@@ -58,13 +47,13 @@ autism_ds |>
                      labels = as.character(seq(0, 10, 1))) +
   labs(x = "Score",
        y = "Count",
-       title = "Histogram of Scores") + 
+       title = "Score Distribution") + 
   theme_minimal()
 ```
 
 As we can see in a quick summary of our data, the variable we are most interested in – the final score of users – ranges from 0 to 10, which makes sense as 10 questions can be answered either 'Yes' or 'No'. Generally, the scores are a bit right-skewed, with a single peak around 4 or 5 points. The mean score is 5.077, and the median is 5, both of which are relatively high considering that scores above 6 warrant further diagnostic evaluation. However, because suspecting a diagnosis is a reason for taking the test to begin with, these statistics are reasonable reflections of the test-taking population. We also observe that roughly 30% of test takers are encouraged to seek a diagnosis due to a score higher than 6, as calculated above. We also observe the IQR to be 4 points, as most test takers have a score between 3 and 7 points inclusive. In the context of the data, such a spread is reasonable, and no outliers exist which is understandable given the limited range of scores.
 
-```{r fig.width=5, fig.height=3.3}
+```{r, echo=FALSE, message = FALSE, fig.cap="Distribution of ethnicities across dataset", fig.height=2.5, fig.width=5.5}
 #|echo: false
 #|warning: false
 #|message: false
@@ -80,10 +69,7 @@ autism_ds |>
 
 We observe here that the most common ethnicity was White-Europeans, with over 200 observations in our dataset. Secondly and thirdly, we observe the Asian and Middle Eastern populations to be above 100 and slightly below 100 observations, respectively. All other ethnicities have fewer than 50 observations in our data set, suggesting it may be more difficult to conclude about these populations. We can now check whether the proportion of individuals encouraged to seek a diagnosis varies by ethnicity:
 
-```{r fig.width=5, fig.height=3.3}
-#|echo: false
-#|warning: false
-#|message: false
+```{r, echo=FALSE, message = FALSE, fig.cap="Proportion of indicative score across ethnicities", fig.height=2.5, fig.width=5.5}
 autism_ds %>%
   group_by(ethnicity) %>%
   summarize(yes_count = sum(`Class/ASD` == "YES"),
@@ -92,7 +78,8 @@ autism_ds %>%
   ggplot(aes(x = fct_reorder(ethnicity, proportion_yes, .desc=TRUE), y = proportion_yes)) +
   geom_col(fill = "skyblue") +
   labs(x = "Ethnicity",
-       y = "Proportion of High Test Scores",
+       y = "Proportion
+       High Test Scores",
        title = "Proportion of Indicative Test Scores by Ethnicity") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -100,11 +87,11 @@ autism_ds %>%
 
 As we can see here, the population with the highest proportion of test takers receiving a high test score was the Latino population, with close to half achieving a score higher than a 6. Since this is a comparably uncommon population in our data set, it does raise questions of whether it is indicative of the greater Latino population or merely due to the smaller sample size in our data set. Additionally, the White-European, Black, and Hispanic populations also demonstrate a greater proportion of high test scores. The variation in these proportions according to ethnicity also warrants further exploration into how the distribution of test scores differs by ethnicity. Specifically, the questions remain of whether this means the rates of under- or over-diagnosis vary for different ethnic groups, and if so, what alterations would be necessary to ameliorate these errors.
 
-```{r}
+```{r, include = FALSE}
 summary(autism_ds$age)
 ```
 
-```{r, fig.width=5, fig.height=3.5}
+```{r, echo=FALSE, message = FALSE, warning=FALSE, fig.cap="Age distribution across dataset", fig.height=1.6, fig.width=5.5}
 #|echo: false
 #|warning: false
 #|message: false
@@ -120,7 +107,7 @@ autism_ds |>
 
 Generally, we observe the distribution of ages to possess a strong right-skewness, with a mean age of 30.22 and a median age of 27. There is a clear peak in the age distribution roughly around the early to mid-20s. The ages range from a minimum of 17 to a maximum of 383 – a false observation that should be filtered from the data. The IQR is 13 years, which is a fairly small spread given the range of ages, as we observe that the majority of test-takers are under 30 years old.
 
-```{r, fig.height=6, fig.width=7}
+```{r, echo=FALSE, message = FALSE, fig.cap="Distribution of Y/N responses for Q1-10. The questions are the following: Q1, noticing small sounds; Q2, finding it difficult to work out character intentions; Q3, finding it easy to read between lines; Q4, big picture-oriented; Q5, can tell if someone listening ot me is bored; Q6, can multitask; Q7, can tell feelings from faces; Q8, can go back to work when interrupted; Q9, enjoy collecting info on categories;Q10, find it difficult to work out people's intentions.", fig.height=1.5, fig.width=5.5}
 #|echo: false
 #|warning: false
 #|message: false
@@ -138,19 +125,22 @@ autism_ds |>
     i_find_it_hard_to_figure_out_others_intentions = if_else(i_find_it_hard_to_figure_out_others_intentions == 1, "Yes", "No")
   ) |>
   rename(
-    `Small Sounds` = small_sounds,
-    `Hard to Understand Characters` = difficult_to_understand_char,
-    `Reads Between the Lines Easily` = ease_to_read_between_lines,
-    `Focuses on Whole Picture` = focus_on_whole_picture,
-    `Can Tell If Someone's Bored` = i_can_tell_if_someone_bored,
-    `Can Multitask` = i_can_multi_task,
-    `Can Read Feelings From Faces` = i_can_tell_feelings_from_faces,
-    `Resumes Work After Interruption` = i_can_go_back_to_work_when_interrupted,
-    `Likes to Collect Category Info` = i_like_to_collect_info_on_categories,
-    `Finds It Hard to Read Intentions` = i_find_it_hard_to_figure_out_others_intentions
+    `Q1` = small_sounds,
+    `Q2` = difficult_to_understand_char,
+    `Q3` = ease_to_read_between_lines,
+    `Q4` = focus_on_whole_picture,
+    `Q5` = i_can_tell_if_someone_bored,
+    `Q6` = i_can_multi_task,
+    `Q7` = i_can_tell_feelings_from_faces,
+    `Q8` = i_can_go_back_to_work_when_interrupted,
+    `Q9` = i_like_to_collect_info_on_categories,
+    `Q10` = i_find_it_hard_to_figure_out_others_intentions
   ) |>
-  select("Small Sounds":"Finds It Hard to Read Intentions") |>
+  select("Q1":"Q10") |>
   pivot_longer(everything(), names_to = "question", values_to = "response") |>
+  mutate(
+    question = factor(question, levels = paste0("Q", 1:10))  
+  ) |>
   ggplot(aes(x = question, fill = response)) +
   geom_bar(position = "fill") +
   labs(
@@ -159,59 +149,56 @@ autism_ds |>
     title = "Distribution of Yes/No Responses to Autism Screening Questions",
     fill = "Response"
   ) +
-  scale_fill_viridis_d() +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  scale_fill_brewer(palette = "Blues") +
+  theme_minimal()
 ```
 
-The two questions with the highest proportion of "Yes" responses were "resume work after interruption" and "small sounds," suggesting that these behaviors are common among respondents. On the other hand, the questions "can multitask" and "likes to collect category info" had noticeably lower "Yes" responses, potentially indicating difficulties in such areas. Most questions, however, had roughly even proportions between "Yes" and "No" responses.
+The two questions with the highest proportion of "Yes" responses were Q1 and Q8, suggesting that these behaviors are common among respondents. On the other hand,  Q6 and Q9 had noticeably lower "Yes" responses, potentially indicating difficulties in such areas. Most questions, however, had roughly even proportions between "Yes" and "No" responses.
 
-**Bivariate EDA**
+**ii. Bivariate EDA**
 
-```{r}
-#|echo: false
-#|warning: false
-#|message: false
+```{r, echo=FALSE, message = FALSE, warning = FALSE, fig.cap="Score distribution across ethnicities", fig.height=2.25, fig.width=5.5}
 ### Result score distributions by ethnicity
 ggplot(autism_ds, 
-       aes(x = result,
-           y = ethnicity,
+       aes(y = result,
+           x = ethnicity,
            fill = ethnicity)) +
   geom_boxplot() +
   labs(
     title = "Scores Distributions Across Ethnicity",
-    x = "Score",
-    y = "Ethnicity",
-    fill = "Ethnicity"
-  ) +
-  theme_minimal()
-
+    y = "Score",
+    fill = "Ethnicity",
+    x = ""
+  )  +
+  scale_fill_brewer(palette = "Blues", guide = "none")+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+Here we present several graphs displaying bivariate relationships. With our first set of box plots, we find further evidence for our previous suspicion that test score distributions differ by ethnicity. Although most ethnicities have a median within the range of roughly 3 to 6, some ethnicities, like the White-European, Black, and Hispanic populations, demonstrate a greater spread through their larger IQRs, while the Turkish, Middle Eastern, and Asian populations are much more concentrated around their medians. However, most ethnicities appear to have values almost entirely across the range of 0 to 10 in their test scores.
+```{r, echo=FALSE, message = FALSE, fig.cap="Distribution of scores by respondent type", fig.height=2, fig.width=5.5}
 ggplot(autism_ds, 
-       aes(x = result,
-           y = relation,
+       aes(y = result,
+           x = relation,
            fill = relation)) +
   geom_violin(alpha = 0.5) +
   labs(
     title = "Score Distribution by Respondent Type",
-    x = "Score",
-    y = "Relation",
-    fill
+    y = "Score",
+    x = "Relation"
   ) +
+  scale_fill_brewer(palette = "Blues", guide = "none") +
   theme_minimal()
 
 ```
-
-Here we present several graphs displaying bivariate relationships. With our first set of box plots, we find further evidence for our previous suspicion that test score distributions differ by ethnicity. Although most ethnicities have a median within the range of roughly 3 to 6, some ethnicities, like the White-European, Black, and Hispanic populations, demonstrate a greater spread through their larger IQRs, while the Turkish, Middle Eastern, and Asian populations are much more concentrated around their medians. However, most ethnicities appear to have values almost entirely across the range of 0 to 10 in their test scores.
-
 Interestingly, we can also observe how the relationship between the test taker and the subject of the questions may lead to different distributions of test scores. In the case when it is filled out by a relative or health care professional for example, the observed test score is 2 or greater, while in the case of the test taker being the subject or the parent of the subject, some still received a score of 0. This could reflect how personal biases or relationships affect truthfulness during the test.
 
 This initial exploration leads us to investigate one of these questions further, and particularly how our demographic data may impact the probability of being encouraged to seek a formal diagnosis. Though we cannot identify a definitive answer of whether it is due to social or cultural perceptions of autism within these subgroups or true difference in rates of its presence, it is worth identifying whether over- or under-diagnosis for certain subgroups is possible.
 
-## Methodology
+**II. Methodology**
 
-**Choosing Predictors**
+**i. Choosing Predictors**
 
-```{r}
+```{r, echo=FALSE, message = FALSE}
 #TODO: check for redundancy of mutating the highProb column and the usage of the reduced model for some of our features
 
 ### Ethnicity DD
@@ -232,7 +219,7 @@ tidy(ethnicity_model) |>
   kable(digits = 3)
 ```
 
-```{r}
+```{r, echo=FALSE, message = FALSE}
 ### Relation DD
 
 relation_model <- glm(highProb ~ relation, 
@@ -247,7 +234,7 @@ tidy(relation_model) |>
   kable(digits = 3)
 ```
 
-```{r}
+```{r, echo=FALSE, message = FALSE}
 ## Age
 reduced_model <- glm(highProb ~ 1, 
               data = autism_ds, family = "binomial")
@@ -263,7 +250,7 @@ tidy(age_model) |>
   kable(digits = 3)
 ```
 
-```{r}
+```{r, echo=FALSE, message = FALSE}
 ### Gender
 gender_model <- glm(highProb ~ gender, 
               data = autism_ds, family = "binomial")
@@ -277,7 +264,7 @@ tidy(gender_model) |>
   kable(digits = 3)
 ```
 
-```{r}
+```{r, echo=FALSE, message = FALSE}
 ### Jaundice
 jaundice_model <- glm(highProb ~ jundice, 
               data = autism_ds, family = "binomial")
@@ -297,7 +284,7 @@ Table 1: Drop-in-deviance test results comparing null model $log(\frac{\hat\pi}{
 
 From the results of this test, it is evident that the parameters that are statistically significant for model fit are ethnicity, gender, and, quite surprisingly, neonatal jaundice when compared to a null model as the p-values are either significantly less than 0.05 (as in ethnicity) or slightly below it (gender and jaundice). We further investigate the correlation between answers to questions below:
 
-```{r}
+```{r, echo=FALSE, message = FALSE}
 q1_to_10 <- autism_ds |>
   select(small_sounds, difficult_to_understand_char,
          ease_to_read_between_lines,
@@ -333,7 +320,7 @@ By computing a correlation heat map among the ten behavior questions to check mu
 
 However, we note that having more uncorrelated questions is actually preferable, as that indicates that we are asking about a variety of behaviors that may lead to a diagnosis of autism, improving the chances we identify whether a subject has multiple indicators. Thus, we continue with quantifying the relationship between demographic data and high test scores.
 
-**Fitting the Model**
+**ii. Fitting the Model**
 
 An additive logistic regression model of the following form will be fitted:
 
@@ -341,7 +328,7 @@ $$log(\frac{\hat\pi}{1-\hat\pi})=\beta_0$$
 
 Given that the condition we established for "high probability" (i.e. total score greater than 6) allows the logistic model to perfectly separate the response variable in the data into "high" and "low" probabilities as a binary classification, a penalized logistic regression model (LASSO) was employed to reduce the risk of overfitting (Marin, 2021).
 
-```{r}
+```{r, echo=FALSE, message = FALSE}
 model_one_fit <- glm(highProb ~ 1,
                        data = autism_ds, 
                        family = binomial)
@@ -354,7 +341,7 @@ Then to consider adding the demographic data as potential predictors of a high s
 
 $$log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_{ethnicity}X_{ethnicity}+\beta_{gender}X_{gender}+\beta_{jaundice}X_{jaundice}$$
 
-```{r}
+```{r, echo=FALSE, message = FALSE}
 model_two_fit <- glm(highProb ~ 
                        ethnicity + gender + jundice,
                        data = autism_ds, 
@@ -383,7 +370,7 @@ We also note that the p-value of gender indicates a lack of statistical signific
 
 The odds of someone who was born with neonatal jaundice to have a high score on the questionnaire are expected to be 1.90 (calculated from exp(0.640)) times the odds of someone who was not born with jaundice, holding all else constant.
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, echo=FALSE, message = FALSE}
 complex_log_mod <- glm(highProb ~ 
                          ethnicity +
                          gender +
@@ -414,9 +401,9 @@ tidy(final_lasso_model) |>
 
 This model was then employed to augment the original data frame and obtain the estimated probabilities for each observation, these would later be employed for an ROC curve to determine the optimal prediction threshold.
 
-## Results
+**III. Results**
 
-```{r}
+```{r, echo=FALSE, message = FALSE}
 model_two_fit_aug <- augment(model_two_fit)
 
 pred_prob <- predict.glm(model_two_fit, type = "response")
@@ -448,12 +435,18 @@ For model assumptions, logistic regression requires the assumption of log-odds p
 
 Once more, a .740 AUC for factors independent of autistic behaviors indicate that further research is required in the diagnostic criteria and formulation of questionnaires of for autism – but could also suggest that perhaps this particular test is less biased compared to others. It is worth ensuring that everyone can receive the appropriate diagnosis, and thus, receive any desired accommodations for improvement of quality of life.
 
-## References
+**IV. References**
 
-Aishworiya, R., Kim, V., MA, Stewart, S., Hagerman, R., & Feldman, H. M. (2023). Meta-analysis of the Modified Checklist for Autism in Toddlers, Revised/Follow-up for Screening. *PEDIATRICS*, *151*(6). https://doi.org/10.1542/peds.2022-059393
+- Aishworiya, R., Kim, V., MA, Stewart, S., Hagerman, R., & Feldman, H. M. (2023). Meta-analysis of the Modified Checklist for Autism in Toddlers, Revised/Follow-up for Screening. *PEDIATRICS*, *151*(6). https://doi.org/10.1542/peds.2022-059393
 
-Curnow, E., Utley, I., Rutherford, M., Johnston, L., & Maciver, D. (2023). Diagnostic assessment of autism in adults – current considerations in neurodevelopmentally informed professional learning with reference to ADOS-2. *Frontiers in Psychiatry*, *14*. https://doi.org/10.3389/fpsyt.2023.1258204
+- Curnow, E., Utley, I., Rutherford, M., Johnston, L., & Maciver, D. (2023). Diagnostic assessment of autism in adults – current considerations in neurodevelopmentally informed professional learning with reference to ADOS-2. *Frontiers in Psychiatry*, *14*. https://doi.org/10.3389/fpsyt.2023.1258204
 
-Hirota, T., & King, B. H. (2023). Autism spectrum Disorder. *JAMA*, *329*(2), 157. https://doi.org/10.1001/jama.2022.23661
+- Hirota, T., & King, B. H. (2023). Autism spectrum Disorder. *JAMA*, *329*(2), 157. https://doi.org/10.1001/jama.2022.23661
 
-Marin, Z. (2021, April 26). GLM fit: Algorithm did not converge – How to fix it. Statology. https://www.statology.org/glm-fit-algorithm-did-not-converge/ ::: callout-important Before you submit, make sure your code chunks are turned off with `echo: false` and there are no warnings or messages with `warning: false` and `message: false` in the YAML. :::
+- Marin, Z. (2021, April 26). GLM fit: Algorithm did not converge – How to fix it. Statology. https://www.statology.org/glm-fit-algorithm-did-not-converge/ 
+
+::: Before you submit, make sure your code chunks are turned off with `echo: false` and there are no warnings or messages with `warning: false` and `message: false` in the YAML. :::
+
+**V. Additonal Materials**
+
+**i. Raw Model Data**
