@@ -29,6 +29,8 @@ autism_ds <- read_csv("data/autism_ds.csv") %>%
 Autism Spectrum Disorder (ASD) remains a highly prevalent condition despite modern strides made in medical technology. It is reported that nearly 2.2% of adults are affected by ASD, and growing awareness has led to an uptick in diagnoses, particularly in adults who went undiagnosed early in life (Hirota 2023). However, ASD screening tests for all age groups currently contain significant inaccuracies. For example, the most widely used toddler screening test, CHAT-R/FAs, was recently found to produce false negatives in 25% of cases. In contrast, the most commonly used adult autism screening test – the Autism-Spectrum Quotient (AQ) – was found to have limited predictive value in certain populations (Aishworiya 2023; Curnow 2023). Therefore, it has become critical to identify stronger predictors or explore underlying relationships to have more accurate tests and models to predict ASD in adults.
 
 In this study, we will focus on identifying the features that most greatly affect the probability of being encouraged to pursue a diagnosis within this particular questionaire, as created by Prof. Fadi Thabtau of the Manukau Institute of Technology. The data was sourced from users of his app, ASDTests, which screens its users for potential indicators of autism using a ten-question survey. The data set being used will contain ten characteristics along with the answers of each individual to this survey. Because ASD is difficult to identify and can significantly impair an individual's quality of life, understanding the relationship between demographics, certain behaviors, and their association with autism could encourage individuals to seek diagnosis and gain the self-understanding they need. These adults who receive a positive diagnosis can then access the necessary resources for support. Our goal is to identify which aspects of this questionnaire are most closely associated with being encouraged to pursue an autism diagnosis.
+
+For these purposes, both univariate and exploratory data analyses will be pursued as a means of assessing relevant avenues for further investigation and model fitting. These can be appreciated in the following pages. 
 \newpage
 **i. Univariate EDA**
 
@@ -198,7 +200,12 @@ This initial exploration leads us to investigate one of these questions further,
 
 **i. Choosing Predictors**
 
-```{r, echo=FALSE, message = FALSE}
+Firstly, a drop-in-deviance test between a logistic null model without predictor variables and a logistic model with a single predictor was systematically conducted across ethnicity, gender, presence of neonatal jaundice, and relationship as a means of assessing which predictors provide a statistically significant improvement in model fit against the null condition.These were chosen first due to their "less direct" relationship with diagnosis. The hypothesis for this test can be observed below, where $\beta_1$ represents the coefficient for the associated predictor variable: $$H_0: \beta_1 = 0$$ $$H_a: \beta_1 \neq 0$$
+The formulas for the models compared are the following:
+$$Null:log(\frac{\hat\pi}{1-\hat\pi})=\beta_0$$
+$$Alternative:log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_{predictor}x_{predictor}$$
+The following table summarizes the results 
+```{r, include = FALSE}
 #TODO: check for redundancy of mutating the highProb column and the usage of the reduced model for some of our features
 
 ### Ethnicity DD
@@ -211,30 +218,30 @@ ethnicity_model <- glm(highProb ~ ethnicity,
               data = autism_ds, family = "binomial")
 
 cat("D-reduced:", (deviance_reduced <- -2 * glance(reduced_model)$logLik), "\n")
-cat("D-full:", (deviance_full <- -2 * glance(ethnicity_model)$logLik), "\n")
-cat("G-stat:", (G <- deviance_reduced - deviance_full), "\n")
-cat("p-value:", pchisq(G, df = 9, lower.tail = FALSE), "\n")
+cat("D-full:", (deviance_eth <- -2 * glance(ethnicity_model)$logLik), "\n")
+cat("G-stat:", (G_eth <- deviance_reduced - deviance_eth), "\n")
+cat("p-value:", pchisq(G_eth, df = 9, lower.tail = FALSE), "\n")
 
 tidy(ethnicity_model) |>
   kable(digits = 3)
 ```
 
-```{r, echo=FALSE, message = FALSE}
+```{r, include =FALSE}
 ### Relation DD
 
 relation_model <- glm(highProb ~ relation, 
               data = autism_ds, family = "binomial")
 
 cat("D-reduced:",(deviance_reduced <- -2 * glance(reduced_model)$logLik), "\n")
-cat("D-fulll:",(deviance_full <- -2 * glance(relation_model)$logLik), "\n")
-cat("G-stat:",(G <- deviance_reduced - deviance_full), "\n")
-cat("p-value:",pchisq(G, df = 4, lower.tail = FALSE), "\n")
+cat("D-fulll:",(deviance_rel <- -2 * glance(relation_model)$logLik), "\n")
+cat("G-stat:",(G_rel<- deviance_reduced - deviance_rel), "\n")
+cat("p-value:",pchisq(G_rel, df = 4, lower.tail = FALSE), "\n")
 
 tidy(relation_model) |>
   kable(digits = 3)
 ```
 
-```{r, echo=FALSE, message = FALSE}
+```{r, include = FALSE}
 ## Age
 reduced_model <- glm(highProb ~ 1, 
               data = autism_ds, family = "binomial")
@@ -242,49 +249,59 @@ age_model <- glm(highProb ~ age,
               data = autism_ds, family = "binomial")
 
 cat("D-reduced:", (deviance_reduced <- -2 * glance(reduced_model)$logLik), "\n")
-cat("D-full:", (deviance_full <- -2 * glance(age_model)$logLik), "\n")
-cat("G-stat:", (G <- deviance_reduced - deviance_full), "\n")
-cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
+cat("D-full:", (deviance_age <- -2 * glance(age_model)$logLik), "\n")
+cat("G-stat:", (G_age <- deviance_reduced - deviance_age), "\n")
+cat("p-value:", pchisq(G_age, df = 1, lower.tail = FALSE), "\n")
 
 tidy(age_model) |>
   kable(digits = 3)
 ```
 
-```{r, echo=FALSE, message = FALSE}
+```{r, include = FALSE}
 ### Gender
 gender_model <- glm(highProb ~ gender, 
               data = autism_ds, family = "binomial")
 
 cat("D-reduced:", (deviance_reduced <- -2 * glance(reduced_model)$logLik), "\n")
-cat("D-full:", (deviance_full <- -2 * glance(gender_model)$logLik), "\n")
-cat("G-stat:", (G <- deviance_reduced - deviance_full), "\n")
-cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
+cat("D-full:", (deviance_gender <- -2 * glance(gender_model)$logLik), "\n")
+cat("G-stat:", (G_gender <- deviance_reduced - deviance_gender), "\n")
+cat("p-value:", pchisq(G_gender, df = 1, lower.tail = FALSE), "\n")
 
 tidy(gender_model) |>
   kable(digits = 3)
 ```
 
-```{r, echo=FALSE, message = FALSE}
+```{r, include = FALSE}
 ### Jaundice
 jaundice_model <- glm(highProb ~ jundice, 
               data = autism_ds, family = "binomial")
 
 cat("D-reduced:", (deviance_reduced <- -2 * glance(reduced_model)$logLik), "\n")
-cat("D-full:", (deviance_full <- -2 * glance(jaundice_model)$logLik), "\n")
-cat("G-stat:", (G <- deviance_reduced - deviance_full), "\n")
-cat("p-value:", pchisq(G, df = 1, lower.tail = FALSE), "\n")
+cat("D-full:", (deviance_j <- -2 * glance(jaundice_model)$logLik), "\n")
+cat("G-stat:", (G_j <- deviance_reduced - deviance_j), "\n")
+cat("p-value:", pchisq(G_j, df = 1, lower.tail = FALSE), "\n")
 
 tidy(jaundice_model) |>
   kable(digits = 3)
 ```
 
-A drop-in-deviance test between a logistic null model without predictor variables and a logistic model with a single predictor was systematically conducted across ethnicity, gender, presence of neonatal jaundice, and relationship as a means of assessing which predictors provide a statistically significant improvement in model fit against the null condition. The hypothesis for this test can be observed below, where $\beta_1$ represents the coefficient for the associated predictor variable: $$H_0: \beta_1 = 0$$ $$H_a: \beta_1 \neq 0$$
+```{r, message=FALSE, echo =FALSE, tab.cap="Non-obvious predictors drop-in-deviance test results" }
+header <- c("Deviance", "G statistic (respect to null)", "p-value")
+Null <- c(round(deviance_reduced, 3), "NA", "NA")
 
-Table 1: Drop-in-deviance test results comparing null model $log(\frac{\hat\pi}{1-\hat\pi})=\beta_0$ to single-predictor model $log(\frac{\pi}{1-\pi})=\beta_0 + \beta_1X_1$
+Ethnicity <- c(round(deviance_eth, 3), round(G_eth,3), round(pchisq(G_eth, df = 9, lower.tail = FALSE),5))
+Relation <- c(round(deviance_rel,3), round(G_rel,3), round(pchisq(G_rel, df = 4, lower.tail = FALSE),3))
+Age <- c(round(deviance_age,3), round(G_age,3), round(pchisq(G_age, df = 1, lower.tail = FALSE),3))
+Gender <- c(round(deviance_gender,3), round(G_gender,3), round(pchisq(G_gender, df = 1, lower.tail = FALSE),3))
+Jaundice <- c(round(deviance_j,3), round(G_j,3),  round(pchisq(G_j, df = 1, lower.tail = FALSE),3))
 
+non_obvious_pred <- rbind(Null, Ethnicity, Relation, Age, Gender, Jaundice)
+colnames(non_obvious_pred) <- header
+
+kable(non_obvious_pred)
+```
 From the results of this test, it is evident that the parameters that are statistically significant for model fit are ethnicity, gender, and, quite surprisingly, neonatal jaundice when compared to a null model as the p-values are either significantly less than 0.05 (as in ethnicity) or slightly below it (gender and jaundice). We further investigate the correlation between answers to questions below:
-
-```{r, echo=FALSE, message = FALSE}
+```{r, echo=FALSE, message = FALSE, fig.cap = "Correlation between AQ10 questions"}
 q1_to_10 <- autism_ds |>
   select(small_sounds, difficult_to_understand_char,
          ease_to_read_between_lines,
