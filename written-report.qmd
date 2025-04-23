@@ -31,7 +31,7 @@ Autism Spectrum Disorder (ASD) remains a highly prevalent condition despite mode
 
 In this study, we will focus on identifying the features that most greatly affect the probability of being encouraged to pursue a diagnosis within this particular questionaire, as created by Prof. Fadi Thabtau of the Manukau Institute of Technology. The data was sourced from users of his app, ASDTests, which screens its users for potential indicators of autism using a ten-question survey. The data set being used will contain ten characteristics along with the answers of each individual to this survey. Because ASD is difficult to identify and can significantly impair an individual's quality of life, understanding the relationship between demographics, certain behaviors, and their association with autism could encourage individuals to seek diagnosis and gain the self-understanding they need. These adults who receive a positive diagnosis can then access the necessary resources for support. Our goal is to identify which aspects of this questionnaire are most closely associated with being encouraged to pursue an autism diagnosis.
 
-For these purposes, both univariate and exploratory data analyses will be pursued as a means of assessing relevant avenues for further investigation and model fitting. These can be appreciated in the following pages. \newpage 
+For these purposes, both univariate and exploratory data analyses will be pursued as a means of assessing relevant avenues for further investigation and model fitting. These can be appreciated in the following pages. \newpage
 
 **i. Univariate EDA**
 
@@ -339,6 +339,7 @@ corrplot(cor_matrix,
 By computing a correlation heat map among the ten behavior questions to check multicollinearity, we note that surprisingly, only a few questions have stronger correlations with one another. This is rather unexpected since we would expect many behaviors to be grouped together and more correlated (e.g., social behaviors). However, the highest correlation is between questions 6 and 9, which are the questions about multitasking and liking to collect information, respectively – this is also a rather surprising pairing. Due to this, Q3, Q5 and Q6 will be disregarded from modeling purposes as they showcase correlation with Q4, Q9, and Q10.
 
 Considering this reality, principal component analysis was employed as a means of determining the question clusters that explain the highest variance and selecting the most significant in terms of loading for later inclusion in models (Szczęsna, 2022; finnstats, 2021).
+
 ```{r, include=FALSE}
 pca <- prcomp(autism_ds |>
      rename(
@@ -374,17 +375,12 @@ ggplot(loadings_df, aes(x = question, y = abs(loading), fill = PC)) +
   scale_fill_discrete(guide = "none") +
   theme_minimal()
 ```
-Ignoring questions 3, 5, and 6 due to issues with correlation, the questions that imply the most loading for principal components (i.e. the parameters that explain the most variance) are Q10, Q8, Q4, Q2, and Q1. Higher priority was given to questions that load the highest for the first 7 principal components, as these explain ~83% of variance in the response. Due to this, the answers to these questions will be employed as predictors (i.e finding it hard to figure out others intentions, ease of going back to work when interrupted, focus on whole picture, difficulty to understand characters in stories, and picking up on small sounds). \newpage
+
+Ignoring questions 3, 5, and 6 due to issues with correlation, the questions that imply the most loading for principal components (i.e. the parameters that explain the most variance) are Q10, Q8, Q4, Q2, and Q1. Higher priority was given to questions that load the highest for the first 7 principal components, as these explain \~83% of variance in the response. Due to this, the answers to these questions will be employed as predictors (i.e finding it hard to figure out others intentions, ease of going back to work when interrupted, focus on whole picture, difficulty to understand characters in stories, and picking up on small sounds). \newpage
 
 **ii. Fitting the Model**
 
-Considering the two "groups" of variables we are working with: question answers and demogrpahic information. Two models will be fitted and compared in terms of a drop-in-deviance test: (a) a model that only accounts for the answers to the questions and (b) a model that accounts for demographic data on top of the previously selected questions. Subsequently, the models fitted will be of the forms:
-$$Null:log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_{Q1}X_{Q1} + \beta_{Q2}X_{Q2}+ \beta_{Q4}X_{Q4} + \beta_{Q8}X_{Q8} + \beta_{Q10}X_{Q10}$$
-$$Alternative:log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_{Q1}X_{Q1} +\beta_{Q2}X_{Q2}+ \beta_{Q4}X_{Q4} + \beta_{Q8}X_{Q8} + \beta_{Q10}X_{Q10}+$$ $$\beta_{ethnicity}X_{ethnicity}+\beta_{gender}X_{gender}+\beta_{jaundice}X_{jaundice}$$
-Subsequently, the hypotheses for the test will be the following:
-$$H_0: \beta_{ethnicity}=\beta_{gender}=\beta_{jaundice}=0$$
-$$H_a: \beta_{ethnicity}, \beta_{gender}, \beta_{jaundice}\neq0 \space, for \space one \space \beta_j$$
-This is to assess whether demographic predictors significantly improve model fit with respect to predictors that most significantly explain the variability in final score and, ultimately, diagnosis. Additionally, AIC and BIC were included for additional comparison.
+Considering the two "groups" of variables we are working with: question answers and demogrpahic information. Two models will be fitted and compared in terms of a drop-in-deviance test: (a) a model that only accounts for the answers to the questions and (b) a model that accounts for demographic data on top of the previously selected questions. Subsequently, the models fitted will be of the forms: $$Null:log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_{Q1}X_{Q1} + \beta_{Q2}X_{Q2}+ \beta_{Q4}X_{Q4} + \beta_{Q8}X_{Q8} + \beta_{Q10}X_{Q10}$$ $$Alternative:log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_{Q1}X_{Q1} +\beta_{Q2}X_{Q2}+ \beta_{Q4}X_{Q4} + \beta_{Q8}X_{Q8} + \beta_{Q10}X_{Q10}+$$ $$\beta_{ethnicity}X_{ethnicity}+\beta_{gender}X_{gender}+\beta_{jaundice}X_{jaundice}$$ Subsequently, the hypotheses for the test will be the following: $$H_0: \beta_{ethnicity}=\beta_{gender}=\beta_{jaundice}=0$$ $$H_a: \beta_{ethnicity}, \beta_{gender}, \beta_{jaundice}\neq0 \space, \text{for at least one} \space \beta_j$$ This is to assess whether demographic predictors significantly improve model fit with respect to predictors that most significantly explain the variability in final score and, ultimately, diagnosis. Additionally, AIC and BIC were included for additional comparison.
 
 ```{r, include = FALSE}
 autism_ds$ethnicity <- relevel(factor(autism_ds$ethnicity), ref = "White-European")
@@ -430,22 +426,28 @@ drop_in_deviance <- tibble(
 ```{r, echo=FALSE, tab.cap="Alternative and null model comparison in terms of deviance, AIC, and BIC"}
 kable(model_comparison, digits = 2)
 ```
-It is evident that the alternative model (i.e. the one that account for demographic information on top of question data) performs significantly better exhibiting lower deviance, AIC. Nevrtheless, the BIC is higher. This is, however expected given the number of predictors as ethnicity is a categorical variable with 10 levels. 
+
+It is evident that the alternative model (i.e. the one that account for demographic information on top of question data) performs significantly better exhibiting lower deviance, AIC. Nevrtheless, the BIC is higher. This is, however expected given the number of predictors as ethnicity is a categorical variable with 10 levels.
+
 ```{r, echo=FALSE, tab.cap="Drop-in-deviance test result for alternative and null models"}
 kable(drop_in_deviance, digits = 4)
 
 ```
+
 The drop-in-deviance tests corroborates that these results are statistically significant and that we can reject the null hypothesis since the p-value is less than 0.05. Hence, the alternative model will be further assessed.
 
 ```{r, echo=FALSE, tab.cap="Output for alternative model"}
 tidy(alt_mod_score_fit) |>
   kable(digits = 3)
 ```
-The intercept for this model represents that, for an individual who answered no to all the AQ10 questions relevant to the model, who identifies as White-European, is female and did not have neonatal jaundice the odds of being classified as high probability for autism are `r round(exp(-7.906), 3)`.
 
-The estimates for the AQ10 showcase strong statistical associations with higher odds of ASD. Holding all else constant, individuals who reported picking up on small sounds have odds of being characterized as high probability for ASD increase by a factor of `r round(exp(2.26), 3)`. Likewise, difficulty understanding character intentions (OR =  `r round(exp(1.695), 3)`), tendency to focus on whole picture (OR =  `r round(exp(2.636), 3)`), ease of going back to work when interrupted (OR =  `r round(exp(1.761), 3)`),finding it hard to understand others' intentions (OR =`r round(exp(2.228), 3)`) all strongly predict ASD. 
+The intercept for this model represents that, for an individual who answered no to all five of the AQ10 behavior questions relevant to the model, who identifies as White-European, is female and did not have neonatal jaundice, the odds of being classified as high probability for autism are 0.000368, calculated from exp(-7.906).
 
-Among demographic predictors, it is evident that people who identify as Asian, Middle Eastern, or South Asian are significantly less likely to be categorized as high probability for ASD woth odd ratios (ORs) of approximately 0.42, 0.28, and 0.21 respectively. On the other hand those identifying as Black, Hispanic, Latino, Psifika, Turkish, or "Others" do not significantly alter the odds. \newpage
+The estimates for the AQ10 showcase strong statistical associations with higher odds of ASD. Holding all else constant, individuals who reported picking up on small sounds have odds of being characterized as high probability for ASD multiply by a factor of `r round(exp(2.26), 3)`, compared to when they report no to the question. Likewise, difficulty understanding character intentions (OR = `r round(exp(1.695), 3)`), tendency to focus on whole picture (OR = `r round(exp(2.636), 3)`), ease of going back to work when interrupted (OR = `r round(exp(1.761), 3)`), and finding it hard to understand others' intentions (OR =`r round(exp(2.228), 3)`) all strongly correlate with high probability of ASD.
+
+Among demographic predictors, people who identify as Asian, Middle Eastern, or South Asian are significantly less likely to be categorized as high probability for ASD with odd ratios (ORs) of approximately 0.42, 0.28, and 0.21 respectively, compared to the baseline category of White-European.
+
+\newpage
 
 **III. Results**
 
@@ -474,11 +476,13 @@ autoplot(roc_curve) +
   annotate("text", x = 0.65, y = 0.15, label = paste("AUC =", round(auc_val, 3)), size = 5)
 ```
 
-The area under the curve is 0.934, which for a model fitted to demographic data and questionaire data. This is really impressive, however over-fitting is certainly a concern. Nevertheless, this indicates that further investigation into how these the AQ10 may over- or under-diagnose certain population demographics could still be worth pursuing. Thus, broader comparisons would be extremely interesting. 
+The area under the curve is 0.934, which for a model fitted to demographic data and questionaire data. This is really impressive, but over-fitting is certainly a concern. Nevertheless, this indicates that further investigation into how these the AQ10 may over- or under-diagnose certain population demographics could still be worth pursuing. Thus, broader comparisons would be extremely interesting.
 
 For model assumptions, logistic regression requires the assumption of log-odds possessing linearity, randomness, and independence of observations. It is worth noting that of these conditions, randomness is unlikely to be satisfied due to the nature of the data set – it was collected by people who already were likely to suspect an ASD diagnosis, as they are those who took the test voluntarily. However, our other two assumptions are likely to hold for this model, and we still determine our questions, model, and results worth further investigation. We do not need to check linearity as none of our predictors are quantitative. We can also assume independence as there are no anticipated temporal or spatial relationships between individuals taking the questionnaire.
 
-Once more, a .934 AUC for a model that only accounts for 5 questions of the test and demographic data showcases that further analysis should be pursued to assess whether the test is biased towards certain populations. This is especially true given that the odds are notably high for individuals that identify as White-European. \newpage
+Once more, a 0.934 AUC for a model that only accounts for 5 questions of the test and demographic data showcases that further analysis should be pursued to assess whether the test is biased towards certain populations. This is especially true given that the odds are notably high for individuals that identify as White-European.
+
+\newpage
 
 **IV. References**
 
@@ -490,13 +494,12 @@ Once more, a .934 AUC for a model that only accounts for 5 questions of the test
 
 -   Marin, Z. (2021, April 26). GLM fit: Algorithm did not converge – How to fix it. Statology. https://www.statology.org/glm-fit-algorithm-did-not-converge/
 
-- finnstats. (2021, May 14). Principal component analysis (PCA) in R. https://www.r-bloggers.com/2021/05/principal-component-analysis-pca-in-r/
+-   finnstats. (2021, May 14). Principal component analysis (PCA) in R. https://www.r-bloggers.com/2021/05/principal-component-analysis-pca-in-r/
 
-- Szczęsna, K. (2022). PCA in R. RPubs. https://rpubs.com/KarolinaSzczesna/862710
+-   Szczęsna, K. (2022). PCA in R. RPubs. https://rpubs.com/KarolinaSzczesna/862710
 
-::: Before you submit, make sure your code chunks are turned off with `echo: false` and there are no warnings or messages with `warning: false` and `message: false` in the YAML. ::: 
+::: Before you submit, make sure your code chunks are turned off with `echo: false` and there are no warnings or messages with `warning: false` and `message: false` in the YAML. :::
 
 \newpage
 
 **V. Additonal Materials**
-
