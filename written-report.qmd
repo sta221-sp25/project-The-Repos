@@ -380,7 +380,7 @@ Ignoring questions 3, 5, and 6 due to issues with correlation, the questions tha
 
 Considering the two "groups" of variables we are working with: question answers and demogrpahic information. Two models will be fitted and compared in terms of a drop-in-deviance test: (a) a model that only accounts for the answers to the questions and (b) a model that accounts for demographic data on top of the previously selected questions. Subsequently, the models fitted will be of the forms:
 $$Null:log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_{Q1}X_{Q1} + \beta_{Q2}X_{Q2}+ \beta_{Q4}X_{Q4} + \beta_{Q8}X_{Q8} + \beta_{Q10}X_{Q10}$$
-$$Alternative:log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_{Q1}X_{Q1} +\beta_{Q2}X_{Q2}+ \beta_{Q4}X_{Q4} + \beta_{Q8}X_{Q8} + \beta_{Q10}X_{Q10} + \newline \beta_{ethnicity}X_{ethnicity}+\beta_{gender}X_{gender}+\beta_{jaundice}X_{jaundice}$$
+$$Alternative:log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_{Q1}X_{Q1} +\beta_{Q2}X_{Q2}+ \beta_{Q4}X_{Q4} + \beta_{Q8}X_{Q8} + \beta_{Q10}X_{Q10}+$$ $$\beta_{ethnicity}X_{ethnicity}+\beta_{gender}X_{gender}+\beta_{jaundice}X_{jaundice}$$
 Subsequently, the hypotheses for the test will be the following:
 $$H_0: \beta_{ethnicity}=\beta_{gender}=\beta_{jaundice}=0$$
 $$H_a: \beta_{ethnicity}, \beta_{gender}, \beta_{jaundice}\neq0 \space, for \space one \space \beta_j$$
