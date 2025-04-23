@@ -302,7 +302,7 @@ colnames(non_obvious_pred) <- header
 kable(non_obvious_pred)
 ```
 
-From the results of this test, it is evident that the parameters that are statistically significant for model fit are ethnicity, gender, and, quite surprisingly, neonatal jaundice when compared to a null model as the p-values are either significantly less than 0.05 (as in ethnicity) or slightly below it (gender and jaundice). We further investigate the correlation between answers to questions below, as a means of assessing if the test has any pitfalls regarding multicollinearity:
+The results show that the parameters that are statistically significant for model fit are ethnicity, gender, and, quite surprisingly, neonatal jaundice when compared to a null model as the p-values are either significantly less than 0.05 (as in ethnicity) or slightly below it (gender and jaundice). We further investigate the correlation between answers to questions below, as a means of assessing if the test has any pitfalls regarding multicollinearity:
 
 ```{r, echo=FALSE, message = FALSE, fig.cap = "Correlation between AQ10 questions", fig.height=2.75, fig.width=10.5}
 q1_to_10 <- autism_ds |>
@@ -376,7 +376,7 @@ ggplot(loadings_df, aes(x = question, y = abs(loading), fill = PC)) +
   theme_minimal()
 ```
 
-Ignoring questions 3, 5, and 6 due to issues with correlation, the questions that imply the most loading for principal components (i.e. the parameters that explain the most variance) are Q10, Q8, Q4, Q2, and Q1. Higher priority was given to questions that load the highest for the first 7 principal components, as these explain \~83% of variance in the response. Due to this, the answers to these questions will be employed as predictors (i.e finding it hard to figure out others intentions, ease of going back to work when interrupted, focus on whole picture, difficulty to understand characters in stories, and picking up on small sounds). \newpage
+Ignoring questions 3, 5, and 6 due to issues with correlation, the questions that imply the most loading for principal components (i.e. the parameters that explain the most variance) are Q10, Q8, Q4, Q2, and Q1. Higher priority was given to questions that load the highest for the first 7 principal components, as these explain \~83% of variance in the response. Due to this, the answers to these questions will be employed as predictors (i.e finding it hard to figure out others intentions (Q10), ease of going back to work when interrupted (Q8), focus on whole picture (Q4), difficulty to understand characters in stories (Q2), and picking up on small sounds (Q1)). \newpage
 
 **ii. Fitting the Model**
 
@@ -427,14 +427,15 @@ drop_in_deviance <- tibble(
 kable(model_comparison, digits = 2)
 ```
 
-It is evident that the alternative model (i.e. the one that account for demographic information on top of question data) performs significantly better exhibiting lower deviance, AIC. Nevrtheless, the BIC is higher. This is, however expected given the number of predictors as ethnicity is a categorical variable with 10 levels.
+Based on the output, we determine that the alternative model (i.e. the one with demographic information on top of question data) performs significantly better exhibiting lower deviance, AIC. Nevertheless, the BIC is higher. This is, however expected given the number of predictors as ethnicity is a categorical variable with 10 levels.
 
 ```{r, echo=FALSE, tab.cap="Drop-in-deviance test result for alternative and null models"}
 kable(drop_in_deviance, digits = 4)
-
 ```
 
-The drop-in-deviance tests corroborates that these results are statistically significant and that we can reject the null hypothesis since the p-value is less than 0.05. Hence, the alternative model will be further assessed.
+The drop-in-deviance tests corroborates that these results are statistically significant and that we can reject the null hypothesis since the p-value is less than 0.05. Hence, the alternative model will be further assessed. \newpage
+
+**III. Results**
 
 ```{r, echo=FALSE, tab.cap="Output for alternative model"}
 tidy(alt_mod_score_fit) |>
@@ -447,11 +448,7 @@ The estimates for the AQ10 showcase strong statistical associations with higher 
 
 Among demographic predictors, people who identify as Asian, Middle Eastern, or South Asian are significantly less likely to be categorized as high probability for ASD with odd ratios (ORs) of approximately 0.42, 0.28, and 0.21 respectively, compared to the baseline category of White-European.
 
-\newpage
-
-**III. Results**
-
-```{r, echo=FALSE, message = FALSE}
+```{r, echo=FALSE, message = FALSE, fig.height = 4.5, fig.width = 10.5}
 pred_prob <- predict.glm(alt_mod_score_fit, type = "response")
 
 # Augment model with prediction and correct factor levels
@@ -476,15 +473,19 @@ autoplot(roc_curve) +
   annotate("text", x = 0.65, y = 0.15, label = paste("AUC =", round(auc_val, 3)), size = 5)
 ```
 
-The area under the curve is 0.934, which for a model fitted to demographic data and questionaire data. This is really impressive, but over-fitting is certainly a concern. Nevertheless, this indicates that further investigation into how these the AQ10 may over- or under-diagnose certain population demographics could still be worth pursuing. Thus, broader comparisons would be extremely interesting.
+The area under the curve is 0.934, which means that the model fits the data very well. Also, the ROC curve goes up to the top-left corner, indicating high sensitivity (true positive rate) at low false positive rate, which also shows that this model can classify people who have high probability for autism and people who do not.
+
+**IV. Discussion + Conclusion**
+
+Our model uses demographic data such as ethnicity, gender, and neonatal jaundice as well as behavioral questionnaire data such as the ease of going back to work after being interrupted, ability to understand whole picture, likelihood to pick up on small sounds, ability to get other people's intentions, and difficulty of understanding characters to predict the likelihood of ASD diagnosis.
 
 For model assumptions, logistic regression requires the assumption of log-odds possessing linearity, randomness, and independence of observations. It is worth noting that of these conditions, randomness is unlikely to be satisfied due to the nature of the data set – it was collected by people who already were likely to suspect an ASD diagnosis, as they are those who took the test voluntarily. However, our other two assumptions are likely to hold for this model, and we still determine our questions, model, and results worth further investigation. We do not need to check linearity as none of our predictors are quantitative. We can also assume independence as there are no anticipated temporal or spatial relationships between individuals taking the questionnaire.
 
-Once more, a 0.934 AUC for a model that only accounts for 5 questions of the test and demographic data showcases that further analysis should be pursued to assess whether the test is biased towards certain populations. This is especially true given that the odds are notably high for individuals that identify as White-European.
+With a high AUC value of 0.934, the classification power of the model is really impressive. However, over-fitting is certainly a concern. Nevertheless, this indicates that further investigation into how these the AQ10 may over- or under-diagnose certain population demographics could still be worth pursuing. This is especially true given that the odds are notably high for individuals that identify as Black and Hispanic. Thus, broader comparisons on this would be insightful.
 
 \newpage
 
-**IV. References**
+**V. References**
 
 -   Aishworiya, R., Kim, V., MA, Stewart, S., Hagerman, R., & Feldman, H. M. (2023). Meta-analysis of the Modified Checklist for Autism in Toddlers, Revised/Follow-up for Screening. *PEDIATRICS*, *151*(6). https://doi.org/10.1542/peds.2022-059393
 
@@ -498,8 +499,6 @@ Once more, a 0.934 AUC for a model that only accounts for 5 questions of the tes
 
 -   Szczęsna, K. (2022). PCA in R. RPubs. https://rpubs.com/KarolinaSzczesna/862710
 
-::: Before you submit, make sure your code chunks are turned off with `echo: false` and there are no warnings or messages with `warning: false` and `message: false` in the YAML. :::
-
 \newpage
 
-**V. Additonal Materials**
+**V. Additional Materials**
