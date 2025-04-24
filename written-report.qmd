@@ -516,3 +516,41 @@ Q9, enjoy collecting info on categories;
 Q10, find it difficult to work out people's intentions.
 
 One thing to note is that while we renamed the ten variables to more descriptive names in our dataset for clarity, we decided to use the Q1–Q10 labels in the visualization for simplicity and cleaner presentation.
+
+In the methodology section, we first performed five drop-in-deviance tests for each of the demographic predictor. In table 1, a summary of the results of the five tests is presented. We would like to show the full output of each test here.
+
+```{r, echo = FALSE}
+### Ethnicity DD
+autism_ds <- autism_ds %>%
+  mutate(highProb = if_else(`Class/ASD` == "YES", 1, 0))
+
+reduced_model <- glm(highProb ~ 1, 
+              data = autism_ds, family = "binomial")
+ethnicity_model <- glm(highProb ~ ethnicity, 
+              data = autism_ds, family = "binomial")
+
+anova(reduced_model, ethnicity_model, test = "Chisq") |> 
+  tidy() |> 
+  kable(digits = 3,
+        caption = "Drop-in-deviance test for ethnicity")
+
+anova(reduced_model, relation_model, test = "Chisq") |> 
+  tidy() |> 
+  kable(digits = 3,
+        caption = "Drop-in-deviance test for relation")
+
+anova(reduced_model, age_model, test = "Chisq") |> 
+  tidy() |> 
+  kable(digits = 3,
+        caption = "Drop-in-deviance test for age")
+
+anova(reduced_model, gender_model, test = "Chisq") |> 
+  tidy() |> 
+  kable(digits = 3,
+        caption = "Drop-in-deviance test for gender")
+
+anova(reduced_model, jaundice_model, test = "Chisq") |> 
+  tidy() |> 
+  kable(digits = 3,
+        caption = "Drop-in-deviance test for jaundice")
+```
