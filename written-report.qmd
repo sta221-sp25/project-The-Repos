@@ -491,6 +491,28 @@ Despite a low to moderate AUC value of 0.74, the classification power of the mod
 
 \newpage
 
-**V. Additional Materials**
+**VI. Additional Materials**
 
-Distribution of Y/N responses for Q1-10. The questions are the following: Q1, noticing small sounds; Q2, finding it difficult to work out character intentions; Q3, finding it easy to read between lines; Q4, big picture-oriented; Q5, can tell if someone listening to me is bored; Q6, can multitask; Q7, can tell feelings from faces; Q8, can go back to work when interrupted; Q9, enjoy collecting info on categories;Q10, find it difficult to work out people's intentions.
+In Figure 5, the distribution of Y/N responses for Q1-10 is illustrated. Here are the details of the 10 behavioral questions (also shown in the data dictionary).
+
+Q1, noticing small sounds;
+
+Q2, finding it difficult to work out character intentions;
+
+Q3, finding it easy to read between lines;
+
+Q4, big picture-oriented;
+
+Q5, can tell if someone listening to me is bored;
+
+Q6, can multitask;
+
+Q7, can tell feelings from faces;
+
+Q8, can go back to work when interrupted;
+
+Q9, enjoy collecting info on categories;
+
+Q10, find it difficult to work out people's intentions.
+
+One thing to note is that while we renamed the ten variables to more descriptive names in our dataset for clarity, we decided to use the Q1–Q10 labels in the visualization for simplicity and cleaner presentation.
