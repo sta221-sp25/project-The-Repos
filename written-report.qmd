@@ -33,7 +33,7 @@ In this study, we will focus on identifying the features that most greatly affec
 
 Because ASD is difficult to identify and can significantly impair an individual's quality of life, understanding the relationship between demographics, certain behaviors, and their association with autism could encourage individuals to seek diagnosis and gain self-understanding. These adults who receive a positive diagnosis can then access the necessary resources for support. Accordingly, our research question is: what aspects of this questionnaire are most closely associated with being encouraged to pursue an autism diagnosis?
 
-For these purposes, both univariate and bivariate data analyses will be pursued as a means of assessing relevant avenues for further investigation and model fitting. We created a new variable indicating the proportion of high scores and otherwise relabeled the features representing questions in the data set with their actual wording for interpretability, in addition to representing "Yes" as a 1 and "No" as a 0 for their values. The exploratory data analysis of the demographic data and questions can be found in the following pages. \newpage
+For these purposes, both univariate and bivariate data analyses will be pursued as a means of assessing relevant avenues for further investigation and model fitting. We relabeled the features representing questions in the data set with their actual wording for interpretability, in addition to representing "Yes" as a 1 and "No" as a 0 for their values. The exploratory data analysis of the demographic data and questions can be found in the following pages.
 
 **i. Univariate EDA**
 
@@ -56,9 +56,9 @@ autism_ds |>
   theme_minimal()
 ```
 
-As we can see in a quick summary of our data, the variable we are most interested in – the final score of users – ranges from 0 to 10, which makes sense as 10 questions can be answered either 'Yes' or 'No'. Generally, the scores are a bit right-skewed, with a single peak around 4 or 5 points. The mean score is 5.077, and the median is 5, both of which are relatively high considering that scores above 6 warrant further diagnostic evaluation. However, because suspecting a diagnosis is a reason for taking the test to begin with, these statistics are reasonable reflections of the test-taking population. We also observe that roughly 30% of test takers are encouraged to seek a diagnosis due to a score higher than 6. We also observe the IQR to be 4 points, as most test takers have a score between 3 and 7 points inclusive. In the context of the data, such a spread is reasonable, and no outliers exist which is understandable given the limited range of scores.
+The variable we are most interested in – the final score of users – ranges from 0 to 10, which makes sense as 10 behavioral questions can be answered either 'Yes' or 'No'. The mean score is 5.077, and the median is 5, both of which are relatively high considering that scores above 6 warrant further diagnostic evaluation. However, because suspecting a diagnosis is a reason for taking the test to begin with, these statistics are reasonable reflections of the test-taking population. We also observe that roughly 30% of test takers are encouraged to seek a diagnosis due to a score higher than 6. We also observe the IQR to be 4 points, as most test takers have a score between 3 and 7 points inclusive. In the context of the data, such a spread is reasonable, and no outliers exist which is understandable given the limited range of scores.
 
-```{r, echo=FALSE, message = FALSE, fig.cap="Distribution of ethnicities across dataset", fig.height=2.5, fig.width=5.5}
+```{r, echo=FALSE, message = FALSE, fig.cap="Distribution of ethnicities across dataset", fig.height=2, fig.width=5.5}
 #|echo: false
 #|warning: false
 #|message: false
@@ -74,7 +74,7 @@ autism_ds |>
 
 We observe here that the most common ethnicity was White-Europeans, with over 200 observations in our data set. Secondly and thirdly, we observe the Asian and Middle Eastern populations to be above 100 and slightly below 100 observations, respectively. All other ethnicities have fewer than 50 observations in our data set, suggesting it may be more difficult to conclude about these populations. We can now check whether the proportion of individuals encouraged to seek a diagnosis varies by ethnicity:
 
-```{r, echo=FALSE, message = FALSE, fig.cap="Proportion of indicative score across ethnicities", fig.height=2.5, fig.width=5.5}
+```{r, echo=FALSE, message = FALSE, fig.cap="Proportion of indicative score across ethnicities", fig.height=2, fig.width=5.5}
 autism_ds %>%
   group_by(ethnicity) %>%
   summarize(yes_count = sum(`Class/ASD` == "YES"),
@@ -84,7 +84,7 @@ autism_ds %>%
   geom_col(fill = "skyblue") +
   labs(x = "Ethnicity",
        y = "Proportion
-       High Test Scores",
+       High Scores",
        title = "Proportion of Indicative Test Scores by Ethnicity") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -96,7 +96,7 @@ As we can see here, the population with the highest proportion of test takers re
 summary(autism_ds$age)
 ```
 
-```{r, echo=FALSE, message = FALSE, warning=FALSE, fig.cap="Age distribution across dataset", fig.height=1.6, fig.width=5.5}
+```{r, echo=FALSE, message = FALSE, warning=FALSE, fig.cap="Age distribution across dataset", fig.height=1.5, fig.width=5.5}
 #|echo: false
 #|warning: false
 #|message: false
@@ -112,7 +112,7 @@ autism_ds |>
 
 Generally, we observe the distribution of ages to possess a strong right-skewness, with a mean age of 30.22 and a median age of 27. There is a clear peak in the age distribution roughly around the early to mid-20s. The ages range from a minimum of 17 to a maximum of 383 – a false observation that should be filtered from the data. The IQR is 13 years, which is a fairly small spread given the range of ages, as we observe that the majority of test-takers are under 30 years old.
 
-```{r, echo=FALSE, message = FALSE, fig.cap="Distribution of Y/N responses for Q1-10. The questions are the following: Q1, noticing small sounds; Q2, finding it difficult to work out character intentions; Q3, finding it easy to read between lines; Q4, big picture-oriented; Q5, can tell if someone listening to me is bored; Q6, can multitask; Q7, can tell feelings from faces; Q8, can go back to work when interrupted; Q9, enjoy collecting info on categories;Q10, find it difficult to work out people's intentions.", fig.height=1.5, fig.width=5.5}
+```{r, echo=FALSE, message = FALSE, fig.cap='Distribution of Y/N responses for Q1-10. Details of what each question represents can be found in the data dictionary and in appendix.', fig.height=1.5, fig.width=5.5}
 #|echo: false
 #|warning: false
 #|message: false
@@ -151,7 +151,7 @@ autism_ds |>
   labs(
     x = "Question",
     y = "Proportion",
-    title = "Distribution of Yes/No Responses to Autism Screening Questions",
+    title = "Distribution of Yes/No Responses to Screening Questions",
     fill = "Response"
   ) +
   scale_fill_brewer(palette = "Blues") +
@@ -492,3 +492,5 @@ Despite a low to moderate AUC value of 0.74, the classification power of the mod
 \newpage
 
 **V. Additional Materials**
+
+Distribution of Y/N responses for Q1-10. The questions are the following: Q1, noticing small sounds; Q2, finding it difficult to work out character intentions; Q3, finding it easy to read between lines; Q4, big picture-oriented; Q5, can tell if someone listening to me is bored; Q6, can multitask; Q7, can tell feelings from faces; Q8, can go back to work when interrupted; Q9, enjoy collecting info on categories;Q10, find it difficult to work out people's intentions.
