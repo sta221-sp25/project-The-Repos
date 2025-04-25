@@ -56,7 +56,7 @@ autism_ds |>
   theme_minimal()
 ```
 
-The variable we are most interested in – the final score of users – ranges from 0 to 10, which makes sense as 10 behavioral questions can be answered either 'Yes' or 'No'. The mean score is 5.077, and the median is 5, both of which are relatively high considering that scores above 6 warrant further diagnostic evaluation. However, because suspecting a diagnosis is a reason for taking the test to begin with, these statistics are reasonable reflections of the test-taking population. We also observe that roughly 30% of test takers are encouraged to seek a diagnosis due to a score higher than 6. We also observe the IQR to be 4 points, as most test takers have a score between 3 and 7 points inclusive. In the context of the data, such a spread is reasonable, and no outliers exist which is understandable given the limited range of scores.
+The variable we are most interested in – the final score of users – ranges from 0 to 10, for each of the 10 behavioral questions. The mean score is 5.077, and the median is 5, both of which are relatively high considering that scores above 6 warrant further diagnostic evaluation. However, because suspecting a diagnosis is a reason for taking the test to begin with, these statistics are reasonable reflections of the test-taking population. We also observe that roughly 30% of subjects are encouraged to seek a diagnosis due to a score higher than 6. We also observe the IQR to be 4 points, as most subjects have a score between 3 and 7 points inclusive. In the context of the data, such a spread is reasonable, and no outliers exist which is understandable given the limited range of scores.
 
 ```{r, echo=FALSE, message = FALSE, fig.cap="Distribution of ethnicities across dataset", fig.height=2, fig.width=5.5}
 #|echo: false
@@ -72,7 +72,7 @@ autism_ds |>
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-We observe here that the most common ethnicity was White-Europeans, with over 200 observations in our data set. Secondly and thirdly, we observe the Asian and Middle Eastern populations to be above 100 and slightly below 100 observations, respectively. All other ethnicities have fewer than 50 observations in our data set, suggesting it may be more difficult to conclude about these populations. We can now check whether the proportion of individuals encouraged to seek a diagnosis varies by ethnicity:
+We observe here that the most common ethnicity was White-European, with over 200 observations in our data set. Secondly and thirdly, we observe the Asian and Middle Eastern populations to be above 100 and slightly below 100 observations, respectively. All other ethnicities have fewer than 50 observations in our data set, suggesting it may be more difficult to conclude about these populations. We can now check whether the proportion of individuals encouraged to seek a diagnosis varies by ethnicity:
 
 ```{r, echo=FALSE, message = FALSE, fig.cap="Proportion of indicative score across ethnicities", fig.height=2, fig.width=5.5}
 autism_ds %>%
@@ -90,7 +90,7 @@ autism_ds %>%
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-As we can see here, the population with the highest proportion of test takers receiving a high test score was the Latino population, with close to half achieving a score higher than a 6. Since this is a comparably uncommon population in our data set, it does raise questions of whether it is indicative of the greater Latino population or merely due to the smaller sample size in our data set. Additionally, the White-European, Black, and Hispanic populations also demonstrate a greater proportion of high test scores. The variation in these proportions according to ethnicity also warrants further exploration into how the distribution of test scores differs by ethnicity. Specifically, the questions remain of whether this means the rates of under- or over-diagnosis vary for different ethnic groups, and if so, what alterations in this questionnaire would be necessary to ameliorate these errors.
+As we can see here, the population with the highest proportion of test takers receiving a high test score was the Latino population, with close to half achieving a score higher than a 6. Since this is a comparably uncommon population in our data set, the question remains of whether this could be representative of the greater Latino population or merely due to the smaller sample size in our data set. Additionally, the White-European, Black, and Hispanic populations also demonstrate a greater proportion of high test scores. The variation in these proportions according to ethnicity also warrants further exploration into how the distribution of test scores differs by ethnicity. Specifically, the questions remain of whether this means the rates of under- or over-diagnosis vary for different ethnic groups, and if so, what alterations in this questionnaire would be necessary to ameliorate these errors.
 
 ```{r, include = FALSE}
 summary(autism_ds$age)
@@ -206,7 +206,15 @@ This initial exploration leads us to investigate particularly how our demographi
 
 **i. Choosing Predictors**
 
-Firstly, a drop-in-deviance test between a logistic null model without predictor variables and only an intercept, and a logistic model with a single predictor was systematically conducted across ethnicity, gender, presence of neonatal jaundice, and relationship to the subject as a means of assessing which predictors provide a statistically significant improvement in model fit against this null condition. This was done to gain information on the relationship between demographic data and test scores. The hypothesis for this test can be observed below, where $\beta_1$ represents the coefficient for the associated predictor variable: $$H_0: \beta_{predictor} = 0$$ $$H_a: \beta_{predictor} \neq 0$$ The formulas for the models compared are the following: $$Null:log(\frac{\hat\pi}{1-\hat\pi})=\beta_0$$ $$Alternative:log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_{predictor}x_{predictor}$$ The following table summarizes the results
+Firstly, a drop-in-deviance test between a logistic null model without predictor variables and only an intercept, and a logistic model with a single predictor was systematically conducted across ethnicity, gender, presence of neonatal jaundice, and relationship to the subject as a means of assessing which predictors provide a statistically significant improvement in model fit against this null condition. Additionally, we also tested the interaction effects of these demographics; we note that we did not further explore potential interactions with jaundice as that is a neonatal condition and we find it unlikely to have any relationship with the other variables. Additionally, we did not test ethnicity and relation's interaction effect due to the high number of levels for both (10 and 5, respectively), so distribution of observations across these subgroups limits our sample sizes. These tests were done to gain information on the relationship between demographic data and test scores. The hypothesis for this test can be observed below, where $\beta_{predictor}$ represents the coefficient for a single associated predictor variable (also noted for the case of a single-level variable): $$H_0: \beta_{predictor} = 0$$ $$H_a: \beta_{predictor} \neq 0$$ The formulas for the models compared are the following: $$\text{Null:}\; \log(\frac{\hat\pi}{1-\hat\pi})=\beta_0$$ $$\text{Alternative:} \; \log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_{predictor}x_{predictor}$$
+
+Similarly, for our interaction effects, where $x_1, x_2$ are the predictors for which we test the interaction effect, again using the example of single-level variables:
+
+$$H_0: \beta_{12} = 0$$ $$H_a: \beta_{12} \neq 0$$
+
+$$\text{Null:} \; \log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_1x_1+\beta_2x_2$$ $$\text{Alternative:}\; \log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_1x_1 + \beta_2x_2 + \beta_{12}(x_1*x_2)$$
+
+The following table summarizes these results.
 
 ```{r, include = FALSE}
 ### Ethnicity DD
@@ -227,7 +235,7 @@ tidy(ethnicity_model) |>
   kable(digits = 3)
 ```
 
-```{r, include =FALSE}
+```{r, include = FALSE}
 ### Relation DD
 
 relation_model <- glm(highProb ~ relation, 
@@ -282,6 +290,87 @@ cat("p-value:", pchisq(G_j, df = 1, lower.tail = FALSE), "\n")
 
 tidy(jaundice_model) |>
   kable(digits = 3)
+
+```
+
+```{r, include = FALSE}
+# Relation/gender interaction model
+reduced_rel_gen <- glm(highProb ~ relation + gender, 
+              data = autism_ds, family = "binomial")
+rel_gen_model <- glm(highProb ~ relation*gender, 
+              data = autism_ds, family = "binomial")
+
+cat("D-reduced:", (deviance_reduced_rel_gen <- -2 * glance(reduced_rel_gen)$logLik), "\n")
+cat("D-full:", (deviance_rel_gen <- -2 * glance(rel_gen_model)$logLik), "\n")
+cat("G-stat:", (G_rel_gen <- deviance_reduced_rel_gen - deviance_rel_gen), "\n")
+cat("p-value:", pchisq(G_rel_gen, df = 4, lower.tail = FALSE), "\n")
+
+tidy(rel_gen_model) |>
+  kable(digits = 3)
+```
+
+```{r, include = FALSE}
+# gender/ethnicity interaction model
+reduced_gen_eth_model <- glm(highProb ~ gender + ethnicity, 
+              data = autism_ds, family = "binomial")
+gen_eth_model <- glm(highProb ~ gender*ethnicity, 
+              data = autism_ds, family = "binomial")
+
+cat("D-reduced:", (deviance_reduced_gen_eth <- -2 * glance(reduced_gen_eth_model)$logLik), "\n")
+cat("D-full:", (deviance_gen_eth <- -2 * glance(gen_eth_model)$logLik), "\n")
+cat("G-stat:", (G_gen_eth <- deviance_reduced_gen_eth - deviance_gen_eth), "\n")
+cat("p-value:", pchisq(G_gen_eth, df = 9, lower.tail = FALSE), "\n")
+
+tidy(gen_eth_model) |>
+  kable(digits = 3)
+```
+
+```{r, include = FALSE}
+# age / gender interaction model
+reduced_gen_age_model <- glm(highProb ~ gender + age, 
+              data = autism_ds, family = "binomial")
+gen_age_model <- glm(highProb ~ gender*age, 
+              data = autism_ds, family = "binomial")
+
+cat("D-reduced:", (deviance_reduced_gen_age <- -2 * glance(reduced_gen_age_model)$logLik), "\n")
+cat("D-full:", (deviance_gen_age <- -2 * glance(gen_age_model)$logLik), "\n")
+cat("G-stat:", (G_gen_age <- deviance_reduced_gen_age - deviance_gen_age), "\n")
+cat("p-value:", pchisq(G_gen_age, df = 1, lower.tail = FALSE), "\n")
+
+tidy(gen_age_model) |>
+  kable(digits = 3)
+```
+
+```{r, include = FALSE}
+# age / relation interaction model
+reduced_rel_age_model <- glm(highProb ~ relation + age, 
+              data = autism_ds, family = "binomial")
+rel_age_model <- glm(highProb ~ relation*age, 
+              data = autism_ds, family = "binomial")
+
+cat("D-reduced:", (deviance_reduced_rel_age <- -2 * glance(reduced_rel_age_model)$logLik), "\n")
+cat("D-full:", (deviance_rel_age <- -2 * glance(rel_age_model)$logLik), "\n")
+cat("G-stat:", (G_rel_age <- deviance_reduced_rel_age - deviance_rel_age), "\n")
+cat("p-value:", pchisq(G_rel_age, df = 4, lower.tail = FALSE), "\n")
+
+tidy(rel_age_model) |>
+  kable(digits = 3)
+```
+
+```{r, include = FALSE}
+# age / ethnicity interaction model
+reduced_eth_age_model <- glm(highProb ~ ethnicity + age, 
+              data = autism_ds, family = "binomial")
+eth_age_model <- glm(highProb ~ ethnicity*age, 
+              data = autism_ds, family = "binomial")
+
+cat("D-reduced:", (deviance_reduced_eth_age <- -2 * glance(reduced_eth_age_model)$logLik), "\n")
+cat("D-full:", (deviance_eth_age <- -2 * glance(eth_age_model)$logLik), "\n")
+cat("G-stat:", (G_eth_age <- deviance_reduced_eth_age - deviance_eth_age), "\n")
+cat("p-value:", pchisq(G_eth_age, df = 9, lower.tail = FALSE), "\n")
+
+tidy(rel_age_model) |>
+  kable(digits = 3)
 ```
 
 ```{r, message=FALSE, echo =FALSE, tab.cap="Non-obvious predictors drop-in-deviance test results" }
@@ -293,14 +382,23 @@ Relation <- c(round(deviance_rel,3), round(G_rel,3), round(pchisq(G_rel, df = 4,
 Age <- c(round(deviance_age,3), round(G_age,3), round(pchisq(G_age, df = 1, lower.tail = FALSE),3))
 Gender <- c(round(deviance_gender,3), round(G_gender,3), round(pchisq(G_gender, df = 1, lower.tail = FALSE),3))
 Jaundice <- c(round(deviance_j,3), round(G_j,3),  round(pchisq(G_j, df = 1, lower.tail = FALSE),3))
+GenderRelation <- c(round(deviance_rel_gen,3), round(G_rel_gen,3), round(pchisq(G_rel_gen, df = 4, lower.tail = FALSE),3))
+GenderEthnicity <- c(round(deviance_gen_eth,3), round(G_gen_eth,3), round(pchisq(G_gen_eth, df = 9, lower.tail = FALSE),3))
+GenderAge <- c(round(deviance_gen_age,3), round(G_gen_age,3), round(pchisq(G_gen_age, df = 1, lower.tail = FALSE),3))
+RelationAge <- c(round(deviance_rel_age,3), round(G_rel_age,3), round(pchisq(G_rel_age, df = 4, lower.tail = FALSE),3))
+EthnicityAge <- c(round(deviance_eth_age,3), round(G_eth_age,3), round(pchisq(G_eth_age, df = 9, lower.tail = FALSE),3))
 
-non_obvious_pred <- rbind(Null, Ethnicity, Relation, Age, Gender, Jaundice)
+non_obvious_pred <- rbind(Null, Ethnicity, Relation, Age, Gender, Jaundice, GenderRelation, GenderEthnicity, GenderAge, RelationAge, EthnicityAge)
 colnames(non_obvious_pred) <- header
 
 kable(non_obvious_pred)
 ```
 
-The results show that the demographics that are statistically significant for the model fit are ethnicity, gender, and, quite surprisingly, neonatal jaundice, when compared to a null model, as the p-values are either significantly less than 0.05 (as in ethnicity) or slightly below it (gender and jaundice). We further investigate the correlation between answers to questions below, as a means of assessing if the test has any pitfalls regarding multicollinearity:
+The results show that the demographics that are statistically significant for the model fit are ethnicity, gender, and, quite surprisingly, neonatal jaundice, when compared to a null model, as the p-values are either significantly less than 0.05 (as in ethnicity) or slightly below it (gender and jaundice). Additionally, we acknowledge potential interactions between gender and age and relationship to the subject and age – but as relationship and age on their own both appear largely insignificant, we choose to neglect these interaction effects in our modeling to avoid unnecessary complexity.
+
+We now check our model conditions in all of these cases. We note that in using our statistically significant predictors later, they are all categorical and thus, do not need to assess linearity between log-odds and our predictors for the logistic regression model. We also note that presumably all of the observations of this test are independent due to no obvious spatial or temporal correlations. However, as mentioned before, the model condition at risk is randomness, as our population is primarily those who already suspect autism. This does limit the generalizability of our model to the general population, especially as taking the screening test is voluntary. However, observing the population of those seeking screening tests, we will assume randomness, and again use this primarily as an investigation of the nature of this questionnaire and associations between demographics and scores.
+
+We further investigate the correlation between answers to questions below, as a means of assessing if the test has any pitfalls regarding multicollinearity:
 
 ```{r, echo=FALSE, message = FALSE, fig.cap = "Correlation between AQ10 questions", fig.height=2.75, fig.width=10.5}
 q1_to_10 <- autism_ds |>
@@ -378,7 +476,7 @@ We can observe that Q3, Q5, and Q6 have high correlation to Q4, Q6, and Q9, resp
 
 **ii. Fitting the Model**
 
-As a means of identifying potential correlations between demographic data and the odds of a high test score, two models will be fitted and compared in terms of a drop-in-deviance test: (a) a null model fitted only to an intercept, and (b) a model that accounts for demographic data. Subsequently, the models fitted will be of the forms: $$Null:log(\frac{\hat\pi}{1-\hat\pi})=\beta_0$$ $$Alternative:log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_{ethnicity}X_{ethnicity}+\beta_{gender}X_{gender}+\beta_{jaundice}X_{jaundice}$$ And the hypotheses for the test will be the following: $$H_0: \beta_{ethnicity}=\beta_{gender}=\beta_{jaundice}=0$$ $$H_a: \beta_{ethnicity}, \beta_{gender}, \beta_{jaundice}\neq0 \space, \text{for at least one} \space \beta_j$$
+As a means of identifying potential correlations between demographic data and the odds of a high test score, two models will be fitted and compared in terms of a drop-in-deviance test: (a) a null model fitted only to an intercept, and (b) a model that accounts for demographic data. Subsequently, the models fitted will be of the forms: $$\text{Null:} \; \log(\frac{\hat\pi}{1-\hat\pi})=\beta_0$$ $$\text{Alternative:} \; \log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_{ethnicity}X_{ethnicity}+\beta_{gender}X_{gender}+\beta_{jaundice}X_{jaundice}$$ And the hypotheses for the test will be the following: $$H_0: \beta_{ethnicity}=\beta_{gender}=\beta_{jaundice}=0$$ $$H_a: \beta_{ethnicity}, \beta_{gender}, \beta_{jaundice}\neq0 \space, \text{for at least one} \space \beta_j$$
 
 This is to assess whether demographic predictors significantly improve model fit and our predictions of the odds of having a high score on the test, and accordingly, being encouraged to pursue a diagnosis. Additionally, AIC and BIC were included for further comparison.
 
@@ -434,9 +532,9 @@ tidy(alt_mod_score_fit) |>
   kable(digits = 3)
 ```
 
-The intercept for this model represents that, for a female individual who identifies as White-European did not have neonatal jaundice, we expect the odds of being classified as high probability for autism are 0.922, calculated from exp(-0.081). We however note a large p-value of 0.625, indicating a strong level of uncertainty of the truth of this expectation.
+Among demographic predictors, subjects who identify as Asian, Middle Eastern, or South Asian appear significantly less likely to be categorized as high probability for ASD with odd ratios (ORs) of approximately 0.182, 0.113, and 0.111 respectively, compared to the baseline category of White-European. We also observe that the Pasifika population has a notable odds ratio, but was once again a rather small group of less than 30 individuals and may prove difficult to generalize. This leads us to wonder if these subgroups are more prone to under-diagnosis, or others to over-diagnosis.
 
-Among demographic predictors, people who identify as Asian, Middle Eastern, or South Asian are significantly less likely to be categorized as high probability for ASD with odd ratios (ORs) of approximately 0.182, 0.113, and 0.111 respectively, compared to the baseline category of White-European. We also observe that the Pasifika population has a notable odds ratio, but was once again a rather small group of less than 30 individuals and may prove difficult to generalize. In individuals with neonatal jaundice, we also observe that we expect the odds to multiply by a factor of 1.90 compared to those without, holding all else constant – indicating a positive association between this condition and receiving a positive screening test.
+In individuals with neonatal jaundice, we also observe that we expect the odds to multiply by a factor of 1.90 compared to those without, holding all else constant – indicating a positive association between this condition and receiving a positive screening test. In practice, this could suggest that individuals with neonatal jaundice should be screened for ASD at a higher rate than their counterparts, as they may require a diagnosis more often; it seems unlikely for these individuals to be experiencing over-diagnosis as the effects of neonatal jaundice are not perceptible later in life and are unlikely to impact others' perceptions of you.
 
 ```{r, echo=FALSE, message = FALSE, fig.height = 4.5, fig.width = 10.5}
 pred_prob <- predict.glm(alt_mod_score_fit, type = "response")
@@ -469,9 +567,9 @@ The area under the curve is 0.74, which means that the model, although not a ter
 
 Our model uses demographic data such as ethnicity, gender, and neonatal jaundice to predict the likelihood of a positive screening test for ASD, for this given questionnaire examining a variety of behaviors.
 
-For model assumptions, logistic regression requires the assumption of log-odds possessing linearity, randomness, and independence of observations. It is worth noting that of these conditions, randomness is unlikely to be satisfied due to the nature of the data set – it was collected by people who already were likely to suspect an ASD diagnosis, as they are those who took the test voluntarily. However, our other two assumptions are likely to hold for this model, and we still determine our questions, model, and results worth further investigation. We do not need to check linearity as none of our predictors are quantitative. We can also assume independence as there are no anticipated temporal or spatial relationships between individuals taking the questionnaire.
+As previously noted, the randomness of our sample is in question, which limits the conclusions of our model and its significance. However, this assessment could serve as an encouragement to pursue further research on the subject of the relationship between particular ethnic subgroups and their rates of over- or under-diagnosis, and how neonatal jaundice impacts risk of developing ASD.
 
-Despite a low to moderate AUC value of 0.74, the classification power of the model is notable given the circumstances. Nevertheless, this indicates that further investigation into how the AQ10 may over- or under-diagnose certain population demographics could still be worth pursuing. This is especially true given that the odds of a positive test appear notably higher for individuals that identify as White, Black, and Hispanic – which could either indicate over-diagnosis of these groups or under-diagnosis of others. Presence of neonatal jaundice could also potentially serve as an additional reason to screen and test individuals. Thus, broader comparisons on the impact of these demographics would be insightful.
+Despite a low to moderate AUC value of 0.74, the classification power of the model is notable given the circumstances of its predictors. This indicates that further investigation into how the AQ10 may over- or under-diagnose certain population demographics could still be worth pursuing. This is especially true given that the odds of a positive test appear notably higher for individuals that identify as White, Black, and Hispanic – which could either indicate over-diagnosis of these groups or under-diagnosis of others. Presence of neonatal jaundice could also potentially serve as an additional reason to screen and test individuals. Thus, broader comparisons on the impact of these demographics would be insightful.
 
 \newpage
 
