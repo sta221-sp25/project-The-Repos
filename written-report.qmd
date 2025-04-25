@@ -334,9 +334,9 @@ corrplot(cor_matrix,
          diag = FALSE)
 ```
 
-By computing a correlation heat map among the ten behavior questions to check multicollinearity, we note that surprisingly, only a few questions have stronger correlations with one another. This is rather unexpected since we would expect many behaviors to be grouped together and more correlated (e.g., social behaviors). However, the highest correlation is between questions 6 and 9, which are the questions about multitasking and liking to collect information, respectively – this is also a rather surprising pairing.
+By computing a correlation heat map among the ten behavior questions to check multicollinearity, we note that a few questions have strong correlations with one another. This is rather unexpected since we would expect many behaviors to be grouped together and more correlated (e.g., social behaviors). However, the highest correlation is between questions 6 and 9, which are the questions about multitasking and liking to collect information, respectively – this is also a rather surprising pairing.
 
-Considering this reality, principal component analysis was employed as a means of determining the question clusters that explain the highest variance to gain further understanding of the nature of the questions and their variety in the screening tets (Szczęsna, 2022; finnstats, 2021).
+Considering this reality, principal component analysis was employed to determine the question clusters that explain the highest variance to gain further understanding of the nature of the questions and their variety in the screening tets (Szczęsna, 2022; finnstats, 2021).
 
 ```{r, include=FALSE}
 pca <- prcomp(autism_ds |>
@@ -374,7 +374,7 @@ ggplot(loadings_df, aes(x = question, y = abs(loading), fill = PC)) +
   theme_minimal()
 ```
 
-We can observe that questions 3, 5, and 6 have high correlation to questions 4, 6, and 9 respectively as found in the correlation map. Beyond these three, the questions that also observe notable loading for principal components (i.e. the parameters that explain the most variance) are Q10, Q8, Q4, Q2, and Q1 (i.e finding it hard to figure out others intentions (Q10), ease of going back to work when interrupted (Q8), focus on whole picture (Q4), difficulty to understand characters in stories (Q2), and picking up on small sounds (Q1)). In general, it seems that some of these questions form categories that are highly correlated to explain the different subsets of behaviors in autism (e.g., social behaviors like reading expressions). \newpage
+We can observe that Q3, Q5, and Q6 have high correlation to Q4, Q6, and Q9, respectively. Beyond these three, the questions that also observe notable loading for principal components (i.e. the parameters that explain the most variance) are Q10, Q8, Q4, Q2, and Q1 (i.e finding it hard to figure out others intentions, ease of going back to work when interrupted, focus on whole picture, difficulty to understand characters in stories, and picking up on small sounds). In general, it seems that some questions form categories that are highly correlated to explain the different subsets of behaviors in autism. However, since the answer to each question might directly be added to the final result if the answer is TRUE, we decide to focus on examining the predictive power of the demographic data on the likelihood of autism. \newpage
 
 **ii. Fitting the Model**
 
