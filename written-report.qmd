@@ -29,11 +29,11 @@ autism_ds <- autism_ds %>%
 
 **I. Introduction**
 
-Autism Spectrum Disorder (ASD) is a highly prevalent condition with nearly 2.2% of adults affected by ASD, and growing awareness has led to an uptick in diagnoses, particularly in adults who went undiagnosed early in life (Hirota 2023). However, ASD screening tests for all age groups currently contain significant inaccuracies. For example, the most widely used toddler screening test, CHAT-R/FAs, was found to produce false negatives in 25% of cases; the most commonly used adult autism screening test – the Autism-Spectrum Quotient (AQ) – was found to have limited predictive value in certain populations (Aishworiya 2023; Curnow 2023). Therefore, it has become critical to identify stronger predictors or explore underlying relationships to have more accurate tests and models to predict ASD in adults.
+Autism Spectrum Disorder (ASD) is a highly prevalent condition with nearly 2.2% of adults affected by ASD, and growing awareness has led to an uptick in diagnoses, particularly in adults who went undiagnosed early in life (Hirota 2023). However, ASD screening tests for all age groups currently contain significant inaccuracies. For example, the most widely used toddler screening test, CHAT-R/FAs, was found to produce false negatives in 25% of cases; the most commonly used adult autism screening test – the Autism-Spectrum Quotient (AQ) – was found to have limited predictive value in certain populations (Aishworiya 2023; Curnow 2023). Thus, it is critical to identify stronger predictors and explore underlying relationships for more accurate tests to predict ASD in adults.
 
-In this study, we will focus on identifying the features that most greatly affect the probability of being encouraged to pursue a diagnosis within a questionnaire created by Prof. Fadi Thabtah of the Manukau Institute of Technology. The data was sourced from users of his app, ASDTests, which screens its users for potential indicators of autism using a ten-question survey (Faizunnabi 2024; Thabtah 2017). The data set being used will contain nine demographic characteristics – ranging from ethnicity to presence of neonatal jaundice – along with the answers of each individual to the ten behavioral questions of this survey. An individual of 383 years old was observed as a clear data entry error, so we restricted age to under 120 years old to remove implausible ages. We relabeled the features representing questions in the data set with their actual wording for interpretability, in addition to representing "Yes" as a 1 and "No" as a 0 for their values.
+In this study, we will focus on identifying the features that most greatly affect the probability of being encouraged to pursue a diagnosis within a questionnaire created by Prof. Fadi Thabtah of the Manukau Institute of Technology. The data was sourced from users of his app, ASDTests, which screens its users for potential indicators of autism using a ten-question survey (Faizunnabi 2024; Thabtah 2017). The data set contains nine demographic characteristics – ranging from age to history of neonatal jaundice – along with the binary answers to the ten behavioral questions of this survey. An individual of 383 years old was observed as a clear data entry error, so we restricted age to under 120 years old to remove implausible ages. We relabeled the features representing questions in the data set with their actual wording for interpretability, in addition to representing "Yes" as a 1 and "No" as a 0 for their values.
 
-Because ASD is difficult to identify and can significantly impair an individual's quality of life, understanding the relationship between demographics, certain behaviors, and their association with autism could encourage individuals to seek diagnosis and gain self-understanding. These adults who receive a positive diagnosis can then access the necessary resources for support. Accordingly, our research question is: what aspects of an individual are most closely associated with a high score on this screening test?
+Because ASD is difficult to identify and can significantly impair an individual's quality of life, understanding the relationship between demographics, behaviors, and their association with autism could encourage individuals to seek the diagnosis they may need, which then enables access to the necessary resources for support. Accordingly, our research question is: what characteristics of an individual are most closely associated with a high score on this screening test? \newpage
 
 **i. Univariate EDA**
 
@@ -56,7 +56,7 @@ autism_ds |>
   theme_minimal()
 ```
 
-The variable we are most interested in – the final score of users – ranges from 0 to 10, for each of the 10 behavioral questions. The mean score is 5.084, and the median is 5, both of which are relatively high considering that scores above 6 warrant further diagnostic evaluation. However, because suspecting a diagnosis is a reason for taking the test to begin with, these statistics are reasonable reflections of the test-taking population. We also observe that roughly 29.6% of subjects are encouraged to seek a diagnosis due to a score higher than 6. We also observe the IQR to be 4 points, as most subjects have a score between 3 and 7 points inclusive. In the context of the data, such a spread is reasonable, and no outliers exist which is understandable given the limited range of scores.
+The final score of individuals ranges from 0 to 10 for each of the 10 behavioral questions. The mean score is 5.084, and the median is 5, which are relatively high considering that scores above 6 warrant further diagnostic evaluation. However, as suspecting a diagnosis is a reason for taking the test to begin with, these are reasonable reflections of the test-taking population. We also observe that roughly 29.6% of subjects are encouraged to seek a diagnosis due to a score higher than 6; the IQR is 4 points, as most subjects have a score between 3 and 7 points inclusive. In the context of the data, such a spread is reasonable, as no outliers exist.
 
 ```{r, echo=FALSE, message = FALSE, fig.cap="Distribution of ethnicities across dataset", fig.height=2, fig.width=5.5}
 #|echo: false
@@ -72,25 +72,7 @@ autism_ds |>
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-White-Europeans comprised the most common ethnicity of our respondents, with over 200 observations in our data set. Secondly and thirdly, the Asian and Middle Eastern populations have over 100 and slightly below 100 observations, respectively. All other ethnicities have fewer than 50 observations in our data set, suggesting it may be more difficult to conclude about these populations. We can now check whether the proportion of individuals encouraged to seek a diagnosis varies by ethnicity:
-
-```{r, echo=FALSE, message = FALSE, fig.cap="Proportion of indicative score across ethnicities", fig.height=2, fig.width=5.5}
-autism_ds %>%
-  group_by(ethnicity) %>%
-  summarize(yes_count = sum(`Class/ASD` == "YES"),
-            total_count = n(),
-            proportion_yes = yes_count / total_count) %>%
-  ggplot(aes(x = fct_reorder(ethnicity, proportion_yes, .desc=TRUE), y = proportion_yes)) +
-  geom_col(fill = "skyblue") +
-  labs(x = "Ethnicity",
-       y = "Proportion
-       High Scores",
-       title = "Proportion of Indicative Test Scores by Ethnicity") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-```
-
-The population with the highest proportion of test takers receiving a high test score was the Latino population, with close to half achieving a score higher than a 6. As a comparably uncommon population in our data set, the question remains of whether this could be representative of the greater Latino population or merely due to the smaller sample size in our data set. Additionally, the White-European, Black, and Hispanic populations also demonstrate a greater proportion of high test scores. The variation in these proportions according to ethnicity warrants further exploration into how the distribution of test scores differs by ethnicity. Specifically, the questions remain of whether this means the rates of under- or over-diagnosis vary for different ethnic groups, and if so, what alterations in this questionnaire would be necessary to ameliorate these errors.
+White-Europeans comprised the most common ethnicity of our respondents, with over 200 observations in our data set, while the Asian and Middle Eastern populations have over 100 and slightly below 100 observations, respectively. All other ethnicities have fewer than 50 observations in our data set, suggesting it may be more difficult to draw conclusions about those groups. We will later observe the differing score distributions as categorized by ethnicity to better understand the relationship between score and ethnicity.
 
 ```{r, include = FALSE}
 summary(autism_ds$age)
@@ -110,9 +92,9 @@ autism_ds |>
   theme_minimal()
 ```
 
-The distribution of ages possesses a strong right-skewness, with a mean age of 29.63 and a median age of 27. There is a clear peak in the age distribution roughly around the early to mid-20s. The ages range from a minimum of 17 to a maximum of 64 years old. The IQR is 13 years, which is a fairly small spread given the range of ages, as we observe that the majority of test-takers are under 30 years old.
+The distribution of ages possesses a strong right-skewness, with a mean age of 29.63 and a median age of 27. There is a clear peak in the age distribution roughly around the early to mid-20s. The ages range from a minimum of 17 to a maximum of 64 years old. The IQR is 13 years, which is a fairly small spread given the range of ages, as the majority of test-takers are under 30 years old.
 
-```{r, echo=FALSE, message = FALSE, fig.cap='Distribution of Y/N responses for Q1-10. Details of what each question represents can be found in the data dictionary and in appendix.', fig.height=1.5, fig.width=5.5}
+```{r, echo=FALSE, message = FALSE, fig.cap='Distribution of Y/N responses for Q1-10 (question details found in appendix).', fig.height=1.5, fig.width=5.5}
 #|echo: false
 #|warning: false
 #|message: false
@@ -158,7 +140,7 @@ autism_ds |>
   theme_minimal()
 ```
 
-The two questions with the highest proportion of "Yes" responses were Q1 and Q8, suggesting that these behaviors are fairly common among respondents. On the other hand, Q6 and Q9 had noticeably lower "Yes" responses, potentially indicating difficulties in such areas. Other questions, however, had roughly even proportions between "Yes" and "No" responses.
+The two questions with the highest proportion of "Yes" responses were Q1 and Q8, suggesting that these behaviors are relatively common among respondents. On the other hand, Q6 and Q9 had noticeably lower "Yes" responses, potentially indicating difficulties in such areas. Other questions, however, had roughly even proportions of "Yes" and "No" responses. \newpage
 
 **ii. Bivariate EDA**
 
@@ -206,7 +188,9 @@ We choose to continue to investigate how our demographic data may impact the odd
 
 **i. Choosing Predictors**
 
-We aim to use predictors to determine the probability of obtaining a high score on the screening test. Firstly, a drop-in-deviance test between a logistic null model without predictor variables and only an intercept, and a logistic model with a single predictor was systematically conducted across ethnicity, gender, presence of neonatal jaundice, and relationship to the subject as a means of assessing which predictors provide a statistically significant improvement in model fit against this null condition. Additionally, we also tested the interaction effects of these demographics; we note that we did not explore potential interactions with jaundice as a neonatal condition unlikely to have any relationship with the other variables. Additionally, we did not test ethnicity and relation's interaction effect due to the high number of levels for both (10 and 5, respectively), so the distribution of observations across these subgroups severely limits our sample sizes across coefficients. These tests were done to gain information on the relationship between demographic data and test scores. The hypothesis for this test can be observed below, where $\beta_{predictor}$ represents the coefficient for a single associated predictor variable (also noted for the case of a single-level variable): $$H_0: \beta_{predictor} = 0$$ $$H_a: \beta_{predictor} \neq 0$$ The formulas for the models compared are the following: $$\text{Null:}\; \log(\frac{\hat\pi}{1-\hat\pi})=\beta_0$$ $$\text{Alternative:} \; \log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_{predictor}x_{predictor}$$
+We aim to use predictors to determine the probability of obtaining a high score on the screening test. Firstly, a drop-in-deviance test between a logistic null model without predictor variables and only an intercept, and a logistic model with a single predictor was systematically conducted across ethnicity, gender, presence of neonatal jaundice, and relationship to the subject as a means of assessing which predictors provide a statistically significant improvement in model fit against this null condition. Additionally, we also tested the interaction effects of these demographics; we note that we did not explore potential interactions with jaundice as a neonatal condition unlikely to have any relationship with the other variables. Additionally, we did not test ethnicity and relation's interaction effect due to the high number of levels for both (10 and 5, respectively), so the distribution of observations across these subgroups severely limits our sample sizes across coefficients. These tests were done to gain information on the relationship between demographic data and test scores. The hypothesis for this test can be observed below, where $\beta_{predictor}$ represents the coefficient for a single associated predictor variable (also noted for the case of a single-level variable): $$H_0: \beta_{predictor} = 0$$ $$H_a: \beta_{predictor} \neq 0$$ The formulas for the models compared are the following:$$\text{Null:}\; \log(\frac{\hat\pi}{1-\hat\pi})=\beta_0$$
+
+$$\text{Alternative:} \; \log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_{predictor}x_{predictor}$$
 
 Similarly, for our interaction effects, where $x_1, x_2$ are the predictors for which we test the interaction effect, again using the example of single-level variables:
 
@@ -430,7 +414,7 @@ corrplot(cor_matrix,
          diag = FALSE)
 ```
 
-By computing a correlation heat map among the ten behavior questions to check multicollinearity, we note that a few questions have strong correlations with one another. This is rather unexpected since we would expect many behaviors to be grouped together and more correlated (e.g., social behaviors). However, the highest correlation is between questions 6 and 9, which are the questions about multitasking and liking to collect information, respectively – this is also a rather surprising pairing. Considering this reality, principal component analysis was employed to determine the question clusters that explain the highest variance to gain further understanding of the nature of the questions and their variety in the screening test (Szczęsna, 2022; finnstats, 2021).
+Unexpectedly, only a few questions have moderate correlations with one another when typically we would expect many behaviors to be grouped together and more correlated (e.g., social behaviors). The highest correlation is between questions 6 and 9, which are the questions about multitasking and liking to collect information, respectively – a rather surprising pairing. Accordingly, principal component analysis was used to determine the question clusters that explain the highest variance to gain further understanding of the nature of the variety of questions in the screening test (Szczęsna, 2022; finnstats, 2021).
 
 ```{r, include=FALSE}
 pca <- prcomp(autism_ds |>
@@ -457,7 +441,7 @@ loadings_df$question <- factor(loadings_df$question, levels = paste0("Q", 1:10))
 loadings_df$PC <- factor(loadings_df$PC, levels = paste0("PC", 1:10))
 ```
 
-```{r, echo=FALSE, fig.cap = "Principal component analysis Q1-10 as a means of choosing questions that best explain the variance in the response", fig.height=6, fig.width=10.5}
+```{r, echo=FALSE, fig.cap = "Principal component analysis Q1-10 as a means of choosing questions that best explain the variance in the response", fig.height=5, fig.width=10.5}
 # Plot
 ggplot(loadings_df, aes(x = question, y = abs(loading), fill = PC)) +
   geom_col(position = "dodge") +
@@ -468,11 +452,11 @@ ggplot(loadings_df, aes(x = question, y = abs(loading), fill = PC)) +
   theme_minimal()
 ```
 
-We can observe that Q3, Q5, and Q6 have high correlation to Q4, Q6, and Q9, respectively. Beyond these three, the questions that also observe notable loading for principal components (i.e. the parameters that explain the most variance) are Q10, Q8, Q4, Q2, and Q1 (i.e finding it hard to figure out others intentions, ease of going back to work when interrupted, focus on whole picture, difficulty to understand characters in stories, and picking up on small sounds). In general, it seems that some questions form categories that are highly correlated to explain the different subsets of behaviors in autism. However, since the answer to each question might directly be added to the final result if the answer is TRUE, we decide to focus on examining the predictive power of the demographic data on the likelihood of autism. \newpage
+We can observe that Q3, Q5, and Q6 have high correlation to Q4, Q6, and Q9, respectively. Beyond these three, the questions that also observe notable loading for principal components (i.e. the parameters that explain the most variance) are Q10, Q8, Q4, Q2, and Q1 (i.e finding it hard to figure out others intentions, ease of going back to work when interrupted, focus on whole picture, difficulty to understand characters in stories, and picking up on small sounds). In general, it seems that some questions form categories that are highly correlated to explain the different subsets of behaviors in autism. However, since the answer to each question might directly be added to the final result if the answer is TRUE, we decide to focus on examining the predictive power of the demographic data on the likelihood of autism.
 
 **ii. Fitting the Model**
 
-As a means of identifying potential correlations between demographic data and the odds of a high test score, two models will be fitted and compared in terms of a drop-in-deviance test: (a) a null model fitted only to an intercept, and (b) an alternative model that accounts for our chosen demographic predictors. $$\text{Null:} \; \log(\frac{\hat\pi}{1-\hat\pi})=\beta_0$$ $$\text{Alternative:} \; \log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_{ethnicity}X_{ethnicity}+\beta_{gender}X_{gender}+\beta_{jaundice}X_{jaundice} + \beta_{age}X_{age}$$
+To identify correlations between demographic data and the odds of a high test score, two models will be fitted and compared by a drop-in-deviance test: (a) a null model fitted only to an intercept, and (b) an alternative model that accounts for our chosen demographic predictors. $$\text{Null:} \; \log(\frac{\hat\pi}{1-\hat\pi})=\beta_0$$ $$\text{Alternative:} \; \log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_{ethnicity}X_{ethnicity}+\beta_{gender}X_{gender}+\beta_{jaundice}X_{jaundice} + \beta_{age}X_{age}$$
 
 And the hypotheses for the test will be the following: $$H_0: \beta_{ethnicity}=\beta_{gender}=\beta_{jaundice}=\beta_{age}=0$$ $$H_a: \text{at least one of} \; \beta_{ethnicity}, \beta_{gender}, \beta_{jaundice}, \beta_{age}\neq0 \space$$
 
@@ -522,7 +506,7 @@ Based on the output, we observe that the alternative model (i.e. the one with de
 kable(drop_in_deviance, digits = 4)
 ```
 
-The drop-in-deviance tests corroborates that these results are statistically significant; we reject the null hypothesis since the p-value is much less than 0.05. Hence, the alternative model will be further assessed as a means of quantifying how demographic data impacts the odds of a positive screening test. \newpage
+The drop-in-deviance tests corroborates that these results are statistically significant; we reject the null hypothesis since the p-value is much less than 0.05. Hence, the alternative model will be further assessed as a means of understanding how demographic data impacts the odds of a positive screening test.
 
 **III. Results**
 
@@ -533,7 +517,7 @@ tidy(alt_mod_score_fit, conf.int = TRUE, conf.level = 0.95) |>
 
 We note that age, gender, and many ethnic groups possess p-values greater than 0.05. Among statistically significant demographic predictors, subjects who identify as Asian, Middle Eastern, or South Asian appear significantly less likely to be categorized as high probability for ASD with expected odds ratios (ORs) of approximately 0.186, 0.115, and 0.114 respectively, compared to the baseline category of White-European, holding all else constant. This leads us to wonder if these subgroups are more prone to under-diagnosis or others to over-diagnosis. The Pasifika population also has a notable odds ratio, but is once again a small group of less than 30 individuals and proves more difficult to generalize.
 
-In individuals with neonatal jaundice, we also observe that we expect the odds of a positive screening test to multiply by a factor of 1.87 compared to those without, holding all else constant. In practice, this could suggest that individuals with neonatal jaundice should be screened for ASD at a higher rate than their counterparts; we note it seems unlikely for these individuals to experience bias in their screening and diagnoses as the effects of neonatal jaundice are not believed to be perceptible at the age of these participants. For that reason, we do not suspect over-diagnosis for this group.
+In individuals with a history of neonatal jaundice, we expect the odds of a positive screening test to multiply by a factor of 1.87 compared to those without, holding all else constant. In practice, this could suggest that individuals with neonatal jaundice should be screened for ASD at a higher rate than their counterparts, as we note it seems unlikely for these individuals to experience bias in their screening and diagnoses since the effects of neonatal jaundice are nearly imperceptible as adults. For that reason, we do not suspect over-diagnosis for this group.
 
 ```{r, echo=FALSE, message = FALSE, fig.height = 4.5, fig.width = 10.5}
 pred_prob <- predict.glm(alt_mod_score_fit, type = "response")
@@ -560,13 +544,11 @@ autoplot(roc_curve) +
   annotate("text", x = 0.65, y = 0.15, label = paste("AUC =", round(auc_val, 3)), size = 5)
 ```
 
-The area under the curve is 0.74, which means that the model, although not a terrible fit, is not particularly remarkable. However, for a model fitted entirely to demographic data which we would expect to be independent of one's diagnosis, this could be considered a notable result.
+The area under the curve is 0.74, which means that the model, although not a terrible fit, is likely insufficient to explain the variation in the odds of a high score on its own. However, as a model fitted entirely to demographic data that we would expect to be independent of one's screening result, this is a notable result.
 
 **IV. Discussion + Conclusion**
 
-Our model uses demographic data such as ethnicity, gender, age, and neonatal jaundice to predict the likelihood of a positive screening test for ASD, for this given screening test examining a variety of behaviors and attitudes. As previously noted, the randomness of our sample is unlikely, which limits the conclusions of our model and its significance. This limitation is in addition to the small sample sizes of certain tested populations, like the Pasifika ethnic group. Still, this assessment could serve as an argument to pursue further research on the subject of the relationship between particular ethnic subgroups and their rates of over- or under-diagnosis, and how neonatal jaundice impacts the risk of developing ASD. Further work on quantifying or exploring these relationships, in addition to how particular subsets of behaviors may relate to the significance of these demographic predictors, could provide a strong framework for understanding the current state of ASD diagnostics in our healthcare system.
-
-Despite a low to moderate AUC value of 0.74, the classification power of the model is notable given the circumstances of its predictors. This indicates that further investigation into how the AQ10 may over- or under-diagnose certain population demographics could still be worth pursuing. This is especially true given that the odds of a positive test appear notably higher for individuals that identify as White, Black, and Hispanic – which could either indicate over-diagnosis of these groups or under-diagnosis of others in the test-taking population. Presence of neonatal jaundice could also potentially serve as an additional reason to screen and test individuals. Thus, broader comparisons on the impact of these demographics would be insightful.
+Our model uses demographic data such as ethnicity, gender, age, and neonatal jaundice to predict the likelihood of a positive screening test for ASD, for this given screening test examining a variety of behaviors and attitudes. Despite a low to moderate AUC value of 0.74, the classification power of the model is notable given the nature of its predictors. For our model conditions, as previously noted, the randomness of our sample is unlikely, which limits the conclusions of our model and its significance. This limitation is in addition to the small sample sizes of certain tested populations, like the Pasifika ethnic group. Still, this assessment could serve as an argument to pursue further research on the subject of the relationship between particular ethnic subgroups and their rates of over- or under-diagnosis, and how neonatal jaundice impacts the risk of developing ASD. This is especially true given that the odds of a positive test appear notably higher for individuals that identify as White, Black, and Hispanic – which could either indicate over-diagnosis of these groups or under-diagnosis of others in the test-taking population. Presence of neonatal jaundice could also potentially serve as an additional reason to screen and test individuals. Thus, broader comparisons on the impact of these demographics would be insightful. Further work on exploring these relationships, in addition to how particular subsets of behaviors may inflate the significance of these demographic predictors, could provide a strong framework for understanding the current state of ASD diagnostics in our healthcare system.
 
 \newpage
 
