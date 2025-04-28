@@ -31,7 +31,7 @@ autism_ds <- autism_ds %>%
 
 Autism Spectrum Disorder (ASD) is a highly prevalent condition with nearly 2.2% of adults affected by ASD, and growing awareness has led to an uptick in diagnoses, particularly in adults who went undiagnosed early in life (Hirota 2023). However, ASD screening tests for all age groups currently contain significant inaccuracies. For example, the most widely used toddler screening test, CHAT-R/FAs, was found to produce false negatives in 25% of cases; the most commonly used adult autism screening test – the Autism-Spectrum Quotient (AQ) – was found to have limited predictive value in certain populations (Aishworiya 2023; Curnow 2023). Thus, it is critical to identify stronger predictors and explore underlying relationships for more accurate tests to predict ASD in adults.
 
-In this study, we will focus on identifying the features that most greatly affect the probability of being encouraged to pursue a diagnosis within a questionnaire created by Prof. Fadi Thabtah of the Manukau Institute of Technology. The data was sourced from users of his app, ASDTests, which screens its users for potential indicators of autism using a ten-question survey (Faizunnabi 2024; Thabtah 2017). The data set contains nine demographic characteristics – ranging from age to history of neonatal jaundice – along with the binary answers to the ten behavioral questions of this survey. An individual of 383 years old was observed as a clear data entry error, so we restricted age to under 120 years old to remove implausible ages. We relabeled the features representing questions in the data set with their actual wording for interpretability, in addition to representing "Yes" as a 1 and "No" as a 0 for their values.
+In this study, we will focus on identifying the features that most greatly affect the probability of being encouraged to pursue a diagnosis within a questionnaire created by Prof. Fadi Thabtah of the Manukau Institute of Technology. The data was sourced from users of his app, ASDTests, which screens its users for potential indicators of autism using a ten-question survey (Faizunnabi 2024; Thabtah 2017). The data set has over 600 observations and contains nine demographic characteristics – ranging from age to history of neonatal jaundice – along with the binary answers to the ten behavioral questions of this survey. An individual of 383 years old was observed as a clear data entry error, so we restricted age to under 120 years old to remove implausible ages. We relabeled the features representing behavioral questions in the data set with their actual wording for interpretability (such as renaming from Q6 to i_can_multitask), in addition to representing "Yes" as a 1 and "No" as a 0 for their values.
 
 Because ASD is difficult to identify and can significantly impair an individual's quality of life, understanding the relationship between demographics, behaviors, and their association with autism could encourage individuals to seek the diagnosis they may need, which then enables access to the necessary resources for support. Accordingly, our research question is: what characteristics of an individual are most closely associated with a high score on this screening test? \newpage
 
@@ -188,7 +188,7 @@ We choose to continue to investigate how our demographic data may impact the odd
 
 **i. Choosing Predictors**
 
-We aim to use predictors to determine the probability of obtaining a high score on the screening test. Firstly, a drop-in-deviance test between a logistic null model without predictor variables and only an intercept, and a logistic model with a single predictor was systematically conducted across ethnicity, gender, presence of neonatal jaundice, and relationship to the subject as a means of assessing which predictors provide a statistically significant improvement in model fit against this null condition. Additionally, we also tested the interaction effects of these demographics; we note that we did not explore potential interactions with jaundice as a neonatal condition unlikely to have any relationship with the other variables. Additionally, we did not test ethnicity and relation's interaction effect due to the high number of levels for both (10 and 5, respectively), so the distribution of observations across these subgroups severely limits our sample sizes across coefficients. These tests were done to gain information on the relationship between demographic data and test scores. The hypothesis for this test can be observed below, where $\beta_{predictor}$ represents the coefficient for a single associated predictor variable (also noted for the case of a single-level variable): $$H_0: \beta_{predictor} = 0$$ $$H_a: \beta_{predictor} \neq 0$$ The formulas for the models compared are the following:$$\text{Null:}\; \log(\frac{\hat\pi}{1-\hat\pi})=\beta_0$$
+We aim to use predictors to determine the probability of obtaining a high score on the screening test. Therefore, we choose logistic regression as the model. Firstly, a drop-in-deviance test between a logistic null model without predictor variables and only an intercept, and a logistic model with a single predictor was systematically conducted across ethnicity, gender, presence of neonatal jaundice, and relationship to the subject as a means of assessing which predictors provide a statistically significant improvement in model fit against this null condition. Additionally, we also tested the interaction effects of these demographics; we note that we did not explore potential interactions with jaundice as a neonatal condition unlikely to have any relationship with the other variables. Additionally, we did not test ethnicity and relation's interaction effect due to the high number of levels for both (10 and 5, respectively), so the distribution of observations across these subgroups severely limits our sample sizes across coefficients. These tests were done to gain information on the relationship between demographic data and test scores. The hypothesis for this test can be observed below, where $\beta_{predictor}$ represents the coefficient for a single associated predictor variable (also noted for the case of a single-level variable): $$H_0: \beta_{predictor} = 0$$ $$H_a: \beta_{predictor} \neq 0$$ The formulas for the models compared are the following:$$\text{Null:}\; \log(\frac{\hat\pi}{1-\hat\pi})=\beta_0$$
 
 $$\text{Alternative:} \; \log(\frac{\hat\pi}{1-\hat\pi})=\beta_0 + \beta_{predictor}x_{predictor}$$
 
@@ -597,41 +597,3 @@ Q9, enjoy collecting info on categories;
 Q10, find it difficult to work out people's intentions.
 
 One thing to note is that while we renamed the ten variables to more descriptive names in our dataset for clarity, we decided to use the Q1–Q10 labels in the visualization for simplicity and cleaner presentation.
-
-In the methodology section, we first performed five drop-in-deviance tests for each of the demographic predictor. In table 1, a summary of the results of the five tests is presented. We would like to show the full output of each test here.
-
-```{r, echo = FALSE}
-### Ethnicity DD
-autism_ds <- autism_ds %>%
-  mutate(highProb = if_else(`Class/ASD` == "YES", 1, 0))
-
-reduced_model <- glm(highProb ~ 1, 
-              data = autism_ds, family = "binomial")
-ethnicity_model <- glm(highProb ~ ethnicity, 
-              data = autism_ds, family = "binomial")
-
-anova(reduced_model, ethnicity_model, test = "Chisq") |> 
-  tidy() |> 
-  kable(digits = 3,
-        caption = "Drop-in-deviance test for ethnicity")
-
-anova(reduced_model, relation_model, test = "Chisq") |> 
-  tidy() |> 
-  kable(digits = 3,
-        caption = "Drop-in-deviance test for relation")
-
-anova(reduced_model, age_model, test = "Chisq") |> 
-  tidy() |> 
-  kable(digits = 3,
-        caption = "Drop-in-deviance test for age")
-
-anova(reduced_model, gender_model, test = "Chisq") |> 
-  tidy() |> 
-  kable(digits = 3,
-        caption = "Drop-in-deviance test for gender")
-
-anova(reduced_model, jaundice_model, test = "Chisq") |> 
-  tidy() |> 
-  kable(digits = 3,
-        caption = "Drop-in-deviance test for jaundice")
-```
