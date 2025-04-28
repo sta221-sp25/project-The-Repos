@@ -474,6 +474,12 @@ alt_mod_score_fit <- glm(highProb ~
                             jundice,
                             data = autism_ds, family = "binomial")
 
+alt_mod_score_fit_no_age <- glm(highProb ~ 
+                            ethnicity + 
+                            gender +
+                            jundice,
+                            data = autism_ds, family = "binomial")
+
 dev_test <- anova(null_mod_score_fit, alt_mod_score_fit, test = "Chisq")
 
 aic_null <- AIC(null_mod_score_fit)
@@ -510,20 +516,21 @@ The drop-in-deviance tests corroborates that these results are statistically sig
 
 **III. Results**
 
-```{r, echo=FALSE, tab.cap="Output for alternative model"}
-tidy(alt_mod_score_fit, conf.int = TRUE, conf.level = 0.95) |>
+A final model was fitted and is shown below. Note that age was discarded as a predictor because it showcased a p-value much greater than 0.05 (0.74) (see additional materials b.). Below is the model that includes all previously mentioned parameters without age.
+```{r, echo=FALSE, tab.cap="Output for alternative model w/o age"}
+tidy(alt_mod_score_fit_no_age, conf.int = TRUE, conf.level = 0.95) |>
   kable(digits = 3)
 ```
 
-We note that age, gender, and many ethnic groups possess p-values greater than 0.05. Among statistically significant demographic predictors, subjects who identify as Asian, Middle Eastern, or South Asian appear significantly less likely to be categorized as high probability for ASD with expected odds ratios (ORs) of approximately 0.186, 0.115, and 0.114 respectively, compared to the baseline category of White-European, holding all else constant. This leads us to wonder if these subgroups are more prone to under-diagnosis or others to over-diagnosis. The Pasifika population also has a notable odds ratio, but is once again a small group of less than 30 individuals and proves more difficult to generalize.
+We note that gender and many ethnic groups possess p-values greater than 0.05. Among statistically significant demographic predictors, subjects who identify as Asian, Middle Eastern, or South Asian appear significantly less likely to be categorized as high probability for ASD with expected odds ratios (ORs) of approximately `r round(exp(-1.702),3)`, `r round(exp(-2.184),3)`, and `r round(exp(-2.196),3)` respectively, compared to the baseline category of White-European, holding all else constant. This leads us to wonder if these subgroups are more prone to under-diagnosis or others to over-diagnosis. The Pasifika population also has a notable odds ratio (`r round(exp(-2.138),3)`), but cannot generalize due to small sample side
 
-In individuals with a history of neonatal jaundice, we expect the odds of a positive screening test to multiply by a factor of 1.87 compared to those without, holding all else constant. In practice, this could suggest that individuals with neonatal jaundice should be screened for ASD at a higher rate than their counterparts, as we note it seems unlikely for these individuals to experience bias in their screening and diagnoses since the effects of neonatal jaundice are nearly imperceptible as adults. For that reason, we do not suspect over-diagnosis for this group.
+In individuals with a history of neonatal jaundice, we expect the odds of a positive screening test to multiply by a factor of `r round(exp(0.639),3)` compared to those without, holding all else constant. In practice, this could suggest that individuals with neonatal jaundice should be screened for ASD at a higher rate than their counterparts, as we note it seems unlikely for these individuals to experience bias in their screening and diagnoses since the effects of neonatal jaundice are nearly imperceptible as adults. For that reason, we do not suspect over-diagnosis for this group.
 
 ```{r, echo=FALSE, message = FALSE, fig.height = 4.5, fig.width = 10.5}
-pred_prob <- predict.glm(alt_mod_score_fit, type = "response")
+pred_prob <- predict.glm(alt_mod_score_fit_no_age, type = "response")
 
 # Augment model with prediction and correct factor levels
-alt_mod_score_fit_aug <- augment(alt_mod_score_fit) |>
+alt_mod_score_fit_aug <- augment(alt_mod_score_fit_no_age) |>
   mutate(
     highProb = factor(highProb, levels = c(0, 1))  # 0 = non-event, 1 = event
   ) |>
@@ -544,11 +551,11 @@ autoplot(roc_curve) +
   annotate("text", x = 0.65, y = 0.15, label = paste("AUC =", round(auc_val, 3)), size = 5)
 ```
 
-The area under the curve is 0.74, which means that the model, although not a terrible fit, is likely insufficient to explain the variation in the odds of a high score on its own. However, as a model fitted entirely to demographic data that we would expect to be independent of one's screening result, this is a notable result.
+The area under the curve is 0.739, which means that the model, although not a terrible fit, is likely insufficient to explain the variation in the odds of a high score on its own. However, as a model fitted entirely to demographic data that we would expect to be independent of one's screening result, this is a notable result.
 
 **IV. Discussion + Conclusion**
 
-Our model uses demographic data such as ethnicity, gender, age, and neonatal jaundice to predict the likelihood of a positive screening test for ASD, for this given screening test examining a variety of behaviors and attitudes. Despite a low to moderate AUC value of 0.74, the classification power of the model is notable given the nature of its predictors. For our model conditions, as previously noted, the randomness of our sample is unlikely, which limits the conclusions of our model and its significance. This limitation is in addition to the small sample sizes of certain tested populations, like the Pasifika ethnic group. Still, this assessment could serve as an argument to pursue further research on the subject of the relationship between particular ethnic subgroups and their rates of over- or under-diagnosis, and how neonatal jaundice impacts the risk of developing ASD. This is especially true given that the odds of a positive test appear notably higher for individuals that identify as White, Black, and Hispanic – which could either indicate over-diagnosis of these groups or under-diagnosis of others in the test-taking population. Presence of neonatal jaundice could also potentially serve as an additional reason to screen and test individuals. Thus, broader comparisons on the impact of these demographics would be insightful. Further work on exploring these relationships, in addition to how particular subsets of behaviors may inflate the significance of these demographic predictors, could provide a strong framework for understanding the current state of ASD diagnostics in our healthcare system.
+Our model predicts the likelihood of a positive ASD screening demographica results, based on a test examining various behaviors and attitudes. Although the AUC value is modest (0.739), the model's classification performance is notable given the predictors which are not derived from the test. Nonetheless, the non-randomness of the sample and small subgroup sizes limit the conclusions. These findings, however, highlight the need for further research into the relationship between ethnicity, neonatal jaundice and ASD diagnosis. The notable higher odds of a positive test among White, Black, and Hispanic individuals suggest potential for over-diagnosis and test bias. Broader comparisons and analysis on the bias of these test could provide stronger frameworks for understanding ASD diagnostic pattern in current healthcare and psychology. 
 
 \newpage
 
@@ -574,6 +581,8 @@ Our model uses demographic data such as ethnicity, gender, age, and neonatal jau
 
 **VI. Additional Materials**
 
+**a. Figure 5: Details**
+
 In Figure 5, the distribution of Y/N responses for Q1-10 is illustrated. Here are the details of the 10 behavioral questions (also shown in the data dictionary).
 
 Q1, noticing small sounds;
@@ -597,3 +606,10 @@ Q9, enjoy collecting info on categories;
 Q10, find it difficult to work out people's intentions.
 
 One thing to note is that while we renamed the ten variables to more descriptive names in our dataset for clarity, we decided to use the Q1–Q10 labels in the visualization for simplicity and cleaner presentation.
+
+**b. Alternative Final Model With Age**
+```{r, echo=FALSE}
+tidy(alt_mod_score_fit, conf.int = TRUE, conf.level = 0.95) |>
+  kable(digits = 3)
+```
+A model that took into account age was previously fitted as it proved to be significant in the drop-in-deviance test with respect to the intercept. However, further inspection idicated it was not a significant predictor, as it had a p-value of 0.724. Subsequently, it was emoved as a predictor
